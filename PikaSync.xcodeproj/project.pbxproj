@@ -1,0 +1,314 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		60D8005890AAE5E5248D5018 /* WakeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAEDF624447F6C43243796F /* WakeLog.swift */; };
+		62CEA496266926F5C1A1E4F7 /* PikaSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF771AC045A10D44432855EB /* PikaSyncApp.swift */; };
+		6D5CC45ABBE70DC547B06E4D /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C79CFB46F1024878927C55 /* SyncEngine.swift */; };
+		D15C8F72DCEEF518BE85A0E7 /* SyncIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		00C79CFB46F1024878927C55 /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
+		507E9248D4787B1306685615 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		6EAEDF624447F6C43243796F /* WakeLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WakeLog.swift; sourceTree = "<group>"; };
+		AF771AC045A10D44432855EB /* PikaSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikaSyncApp.swift; sourceTree = "<group>"; };
+		C4D3EA9AFA6AD90013E1DD09 /* PikaSync.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikaSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncIntent.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		3D161EA72F20D00AC0B31653 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C4D3EA9AFA6AD90013E1DD09 /* PikaSync.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AC5E5005C19A4FEC1DB8D4FB = {
+			isa = PBXGroup;
+			children = (
+				DC48FB81B8A3F6883004836A /* Sources */,
+				3D161EA72F20D00AC0B31653 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DC48FB81B8A3F6883004836A /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				507E9248D4787B1306685615 /* Info.plist */,
+				AF771AC045A10D44432855EB /* PikaSyncApp.swift */,
+				00C79CFB46F1024878927C55 /* SyncEngine.swift */,
+				D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */,
+				6EAEDF624447F6C43243796F /* WakeLog.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AC62A3A12D0B505DF4186E97 /* PikaSync */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A3C3F1ED827DF9DE6B348E8 /* Build configuration list for PBXNativeTarget "PikaSync" */;
+			buildPhases = (
+				B90130747C21966512F0FF85 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PikaSync;
+			packageProductDependencies = (
+			);
+			productName = PikaSync;
+			productReference = C4D3EA9AFA6AD90013E1DD09 /* PikaSync.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D81D7EBE128649F61D65B14B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					AC62A3A12D0B505DF4186E97 = {
+						DevelopmentTeam = WWTV54KS97;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 45FD635DB0598FB2CFAF27B5 /* Build configuration list for PBXProject "PikaSync" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = AC5E5005C19A4FEC1DB8D4FB;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 3D161EA72F20D00AC0B31653 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AC62A3A12D0B505DF4186E97 /* PikaSync */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B90130747C21966512F0FF85 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				62CEA496266926F5C1A1E4F7 /* PikaSyncApp.swift in Sources */,
+				6D5CC45ABBE70DC547B06E4D /* SyncEngine.swift in Sources */,
+				D15C8F72DCEEF518BE85A0E7 /* SyncIntent.swift in Sources */,
+				60D8005890AAE5E5248D5018 /* WakeLog.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		23F8244C08E3126C265B0D73 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WWTV54KS97;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "PikaSync tests background access to your photo library.";
+				INFOPLIST_KEY_UIBackgroundModes = "fetch processing remote-notification";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.travisse.pikasync;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		2C51BE6FECE4180C368A4AA3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		96042404E11B609EC3FA5A62 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		CF4B148E3A281966497C4531 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WWTV54KS97;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "PikaSync tests background access to your photo library.";
+				INFOPLIST_KEY_UIBackgroundModes = "fetch processing remote-notification";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.travisse.pikasync;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1A3C3F1ED827DF9DE6B348E8 /* Build configuration list for PBXNativeTarget "PikaSync" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				23F8244C08E3126C265B0D73 /* Debug */,
+				CF4B148E3A281966497C4531 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		45FD635DB0598FB2CFAF27B5 /* Build configuration list for PBXProject "PikaSync" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2C51BE6FECE4180C368A4AA3 /* Debug */,
+				96042404E11B609EC3FA5A62 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D81D7EBE128649F61D65B14B /* Project object */;
+}

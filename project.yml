@@ -1,0 +1,30 @@
+name: PikaSync
+options:
+  xcodeVersion: '15.4'
+  bundleIdPrefix: com.travisse
+  deploymentTarget:
+    iOS: "17.0"
+targets:
+  PikaSync:
+    type: application
+    platform: iOS
+    sources: [Sources]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.travisse.pikasync
+        DEVELOPMENT_TEAM: WWTV54KS97
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "PikaSync tests background access to your photo library."
+        INFOPLIST_KEY_UIBackgroundModes: "fetch processing remote-notification"
+        GENERATE_INFOPLIST_FILE: YES
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.1.0
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    info:
+      path: Sources/Info.plist
+      properties:
+        NSPhotoLibraryUsageDescription: "PikaSync tests background access to your photo library."
+        UIBackgroundModes: [fetch, processing, remote-notification]
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.travisse.pikasync.refresh
+          - com.travisse.pikasync.process
