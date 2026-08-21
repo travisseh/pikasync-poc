@@ -5,8 +5,10 @@ import UserNotifications
 
 /// The core question this POC answers: can this run WITHOUT the user opening the app?
 enum SyncEngine {
-    static let refreshTaskID = "com.travisse.pikasync.refresh"
-    static let processTaskID = "com.travisse.pikasync.process"
+    // Derived from the bundle so the standalone background-test app
+    // (com.travisse.pikasync.bg) registers its own task ids.
+    static let refreshTaskID = "\(Bundle.main.bundleIdentifier ?? "com.travisse.pikasync").refresh"
+    static let processTaskID = "\(Bundle.main.bundleIdentifier ?? "com.travisse.pikasync").process"
     private static let markerKey = "lastSyncDate"
 
     // MARK: - The "sync" (query new photos since last marker; no upload needed for the POC)

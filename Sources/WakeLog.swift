@@ -12,7 +12,11 @@ struct WakeEvent: Codable, Identifiable {
 }
 
 enum WakeLog {
-    static let ntfyTopic = "pikasync-poc-trav-8347"  // subscribe: https://ntfy.sh/pikasync-poc-trav-8347
+    /// Main app and the standalone background-test app log to separate topics
+    /// so the 7-day experiment stays clean while the main app gets iterated on.
+    static let ntfyTopic = (Bundle.main.bundleIdentifier ?? "").hasSuffix(".bg")
+        ? "pikasync-bg-trav-8347"       // subscribe: https://ntfy.sh/pikasync-bg-trav-8347
+        : "pikasync-poc-trav-8347"      // subscribe: https://ntfy.sh/pikasync-poc-trav-8347
 
     static var fileURL: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]

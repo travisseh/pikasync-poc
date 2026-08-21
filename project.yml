@@ -28,3 +28,30 @@ targets:
         BGTaskSchedulerPermittedIdentifiers:
           - com.travisse.pikasync.refresh
           - com.travisse.pikasync.process
+  PikaSyncBG:
+    type: application
+    platform: iOS
+    sources:
+      - SourcesBG
+      - Sources/SyncEngine.swift
+      - Sources/WakeLog.swift
+      - Sources/SyncIntent.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.travisse.pikasync.bg
+        DEVELOPMENT_TEAM: WWTV54KS97
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "PikaSync BG tests background access to your photo library."
+        INFOPLIST_KEY_UIBackgroundModes: "fetch processing remote-notification"
+        GENERATE_INFOPLIST_FILE: YES
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.1.0
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    info:
+      path: SourcesBG/Info.plist
+      properties:
+        NSPhotoLibraryUsageDescription: "PikaSync BG tests background access to your photo library."
+        UIBackgroundModes: [fetch, processing, remote-notification]
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.travisse.pikasync.bg.refresh
+          - com.travisse.pikasync.bg.process

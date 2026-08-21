@@ -48,7 +48,43 @@ enum VisionScorer {
             s.aesthetics = obs.overallScore   // -1...1
             s.isUtility = obs.isUtility
         }
-        return (s, landmarksReq.results ?? [])
+
+        // Faces eligible for identity embedding: big enough to matter (drops
+        // background strangers), decent capture quality (drops texture false
+        // positives and motion blur), and with landmarks (alignment needs them).
+        let qualityFaces = faceReq.results ?? []
+        let eligible = (landmarksReq.results ?? []).filter { lm in
+            guard lm.boundingBox.width >= 0.05, lm.landmarks != nil else { return false }
+            let q = qualityFaces
+                .filter { iou($0.boundingBox, lm.boundingBox) > 0.3 }
+                .compactMap { $0.faceCaptureQuality }.max() ?? 0
+            return q >= 0.15
+        }
+        return (s, eligible)
+    }
+
+    /// Lean face-only pass for people discovery (no aesthetics/feature print).
+    static func facesOnly(cgImage: CGImage) -> [VNFaceObservation] {
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        let faceReq = VNDetectFaceCaptureQualityRequest()
+        let landmarksReq = VNDetectFaceLandmarksRequest()
+        try? handler.perform([faceReq, landmarksReq])
+        let qualityFaces = faceReq.results ?? []
+        return (landmarksReq.results ?? []).filter { lm in
+            guard lm.boundingBox.width >= 0.05, lm.landmarks != nil else { return false }
+            let q = qualityFaces
+                .filter { iou($0.boundingBox, lm.boundingBox) > 0.3 }
+                .compactMap { $0.faceCaptureQuality }.max() ?? 0
+            return q >= 0.15
+        }
+    }
+
+    private static func iou(_ a: CGRect, _ b: CGRect) -> CGFloat {
+        let inter = a.intersection(b)
+        guard !inter.isNull, inter.width > 0 else { return 0 }
+        let interArea = inter.width * inter.height
+        let union = a.width * a.height + b.width * b.height - interArea
+        return union > 0 ? interArea / union : 0
     }
 
     private static func floats(from obs: VNFeaturePrintObservation) -> [Float] {

@@ -31,9 +31,11 @@ enum JudgeClient {
 
         Choose EXACTLY \(count) photos and design the book:
         - Chronological narrative arc across the month
-        - Balance the people; include 3-5 non-people shots (places, food, details) as texture
+        - Balance the people; labeled names are the family this book is about — strongly prefer photos of them
+        - Include 2-4 non-people shots ONLY if they clearly add story (a place, trip, event, or milestone); skip mundane food, objects, and receipts unless visually exceptional
         - Prefer emotional resonance and storytelling over technical perfection
         - Never pick two photos of the same scene/moment
+        - Captions must state only what is visibly in the photo; never invent names, events, relationships, or activities you cannot see
 
         Respond with ONLY a JSON object, no other text:
         {"title": "short book title", "cover_index": <index>, "selections": [{"index": <int>, "page": <1-\(count) in book order>, "caption": "<=8 words, factual"}]}

@@ -152,6 +152,21 @@ final class PipelineRunner: ObservableObject {
             judgeInfo = result.usageSummary
             book = result.book
             status = "done — \(result.book.selections.count)-photo book ready"
+
+            // persist the run so past books stay viewable
+            let byIndex = Dictionary(uniqueKeysWithValues: chosen.compactMap { s in s.shortlistIndex.map { ($0, s.id) } })
+            let sels = result.book.selections.compactMap { sel in
+                byIndex[sel.index].map { SavedRun.Selection(assetID: $0, page: sel.page, caption: sel.caption) }
+            }
+            if let coverID = byIndex[result.book.cover_index] {
+                let thumb = await loadThumbs(ids: [coverID], size: CGSize(width: 600, height: 600))[coverID]
+                RunStore.shared.add(SavedRun(
+                    id: UUID(), createdAt: Date(), monthLabel: monthName,
+                    title: result.book.title, coverAssetID: coverID, selections: sels,
+                    totalSeconds: stageTimes.reduce(0) { $0 + $1.seconds },
+                    judgeInfo: result.usageSummary,
+                    coverThumbJPEG: thumb?.jpegData(compressionQuality: 0.8)))
+            }
         } catch {
             errorText = "\(error)"
             status = "failed"
@@ -187,6 +202,14 @@ final class PipelineRunner: ObservableObject {
             chosen.append(s)
             chosenIDs.insert(s.id)
             return true
+        }
+
+        // When the book is "about" starred people, face-photos that contain
+        // detected people but NONE of the starred ones are strangers — drop.
+        // (Photos with no eligible faces still qualify as texture shots.)
+        let requiredSet = PeopleStore.shared.requiredIDs
+        let ranked = requiredSet.isEmpty ? ranked : ranked.filter {
+            $0.personIDs.isEmpty || !$0.personIDs.isDisjoint(with: requiredSet)
         }
 
         // week floors

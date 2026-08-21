@@ -9,12 +9,17 @@
 /* Begin PBXBuildFile section */
 		0B9E783212421D2B0EFEF2C6 /* ContactSheetRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */; };
 		0FD46C4808A9F5BE23C6F5B3 /* FaceEmbedder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B093237EA24679EBDAB4454F /* FaceEmbedder.swift */; };
+		242FA215F37DDF754631646A /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C79CFB46F1024878927C55 /* SyncEngine.swift */; };
+		258BEFA1C82C58DF046991A3 /* WakeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAEDF624447F6C43243796F /* WakeLog.swift */; };
 		2E9F6FBE19781CEAE9793174 /* PipelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 914E68CA1E5E3FC3847853AB /* PipelineView.swift */; };
+		3CBEB31C4A85617EADD25CEC /* SyncIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */; };
 		464238A4ECA779125DF2CC71 /* FaceIDBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */; };
+		4A6B51980B3ED2C0AADEAB45 /* BGApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F6068E0F6E73F6E889D3FB /* BGApp.swift */; };
 		4DB1AAA2854A219EDA0B9FAE /* FaceEmbedding.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = B61B3D54A90144B7B9F42955 /* FaceEmbedding.mlpackage */; };
 		60D8005890AAE5E5248D5018 /* WakeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAEDF624447F6C43243796F /* WakeLog.swift */; };
 		62CEA496266926F5C1A1E4F7 /* PikaSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF771AC045A10D44432855EB /* PikaSyncApp.swift */; };
 		6D5CC45ABBE70DC547B06E4D /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C79CFB46F1024878927C55 /* SyncEngine.swift */; };
+		A6A9B1223B827877780F5AC4 /* PeopleScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFE323F5B3C8AB3FE1A89DD /* PeopleScanner.swift */; };
 		A75359DA463DFA82116988D4 /* PeoplePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */; };
 		A7DB15953428C6938B99E4A0 /* Secrets.example.swift.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0642578F74527EE393AC9C5F /* Secrets.example.swift.txt */; };
 		CBED4365709F1372332B7359 /* JudgeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */; };
@@ -23,16 +28,24 @@
 		DE994D60F440CA56D08ADCFD /* VisionScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3381FEE037C5170449DEAD88 /* VisionScorer.swift */; };
 		E348A9CB8A2BE185DECBADC2 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06985FAD552338141D65F423 /* Secrets.swift */; };
 		E605B4F905E539DDDFB8A77D /* PeopleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED070F39260B1772B9FB974C /* PeopleStore.swift */; };
+		F968DBE3C22AE4C792D02DC0 /* AssetLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74AAFE69AD28336C82801908 /* AssetLoader.swift */; };
+		FD8BED19C2C1CB1428B1B09A /* RunStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3067CD55884C0BBEE7EF181D /* RunStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		00C79CFB46F1024878927C55 /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
 		0642578F74527EE393AC9C5F /* Secrets.example.swift.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Secrets.example.swift.txt; sourceTree = "<group>"; };
 		06985FAD552338141D65F423 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		22F6068E0F6E73F6E889D3FB /* BGApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGApp.swift; sourceTree = "<group>"; };
+		3067CD55884C0BBEE7EF181D /* RunStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunStore.swift; sourceTree = "<group>"; };
 		3381FEE037C5170449DEAD88 /* VisionScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionScorer.swift; sourceTree = "<group>"; };
 		507E9248D4787B1306685615 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6EAEDF624447F6C43243796F /* WakeLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WakeLog.swift; sourceTree = "<group>"; };
+		74AAFE69AD28336C82801908 /* AssetLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetLoader.swift; sourceTree = "<group>"; };
+		772082287A77A4A9769987DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8C0A3AF8C41D8EF6B382BBBB /* PikaSyncBG.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikaSyncBG.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		914E68CA1E5E3FC3847853AB /* PipelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineView.swift; sourceTree = "<group>"; };
+		9EFE323F5B3C8AB3FE1A89DD /* PeopleScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleScanner.swift; sourceTree = "<group>"; };
 		A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineRunner.swift; sourceTree = "<group>"; };
 		AF771AC045A10D44432855EB /* PikaSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikaSyncApp.swift; sourceTree = "<group>"; };
 		B093237EA24679EBDAB4454F /* FaceEmbedder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceEmbedder.swift; sourceTree = "<group>"; };
@@ -50,14 +63,17 @@
 		1511E44BBC47A67A1AEB148D /* Pipeline */ = {
 			isa = PBXGroup;
 			children = (
+				74AAFE69AD28336C82801908 /* AssetLoader.swift */,
 				D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */,
 				B093237EA24679EBDAB4454F /* FaceEmbedder.swift */,
 				E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */,
 				FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */,
 				DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */,
+				9EFE323F5B3C8AB3FE1A89DD /* PeopleScanner.swift */,
 				ED070F39260B1772B9FB974C /* PeopleStore.swift */,
 				A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */,
 				914E68CA1E5E3FC3847853AB /* PipelineView.swift */,
+				3067CD55884C0BBEE7EF181D /* RunStore.swift */,
 				3381FEE037C5170449DEAD88 /* VisionScorer.swift */,
 			);
 			path = Pipeline;
@@ -67,14 +83,25 @@
 			isa = PBXGroup;
 			children = (
 				C4D3EA9AFA6AD90013E1DD09 /* PikaSync.app */,
+				8C0A3AF8C41D8EF6B382BBBB /* PikaSyncBG.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		4A610A2404004D71A54CA75F /* SourcesBG */ = {
+			isa = PBXGroup;
+			children = (
+				22F6068E0F6E73F6E889D3FB /* BGApp.swift */,
+				772082287A77A4A9769987DF /* Info.plist */,
+			);
+			path = SourcesBG;
 			sourceTree = "<group>";
 		};
 		AC5E5005C19A4FEC1DB8D4FB = {
 			isa = PBXGroup;
 			children = (
 				DC48FB81B8A3F6883004836A /* Sources */,
+				4A610A2404004D71A54CA75F /* SourcesBG */,
 				3D161EA72F20D00AC0B31653 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -106,6 +133,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		7E4349DC1DB4688932F67F2F /* PikaSyncBG */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A9CF3AE291EB97C3462667C6 /* Build configuration list for PBXNativeTarget "PikaSyncBG" */;
+			buildPhases = (
+				CA04E4DD7471B2CFEEC4023E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PikaSyncBG;
+			packageProductDependencies = (
+			);
+			productName = PikaSyncBG;
+			productReference = 8C0A3AF8C41D8EF6B382BBBB /* PikaSyncBG.app */;
+			productType = "com.apple.product-type.application";
+		};
 		AC62A3A12D0B505DF4186E97 /* PikaSync */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1A3C3F1ED827DF9DE6B348E8 /* Build configuration list for PBXNativeTarget "PikaSync" */;
@@ -133,6 +177,10 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
+					7E4349DC1DB4688932F67F2F = {
+						DevelopmentTeam = WWTV54KS97;
+						ProvisioningStyle = Automatic;
+					};
 					AC62A3A12D0B505DF4186E97 = {
 						DevelopmentTeam = WWTV54KS97;
 						ProvisioningStyle = Automatic;
@@ -154,6 +202,7 @@
 			projectRoot = "";
 			targets = (
 				AC62A3A12D0B505DF4186E97 /* PikaSync */,
+				7E4349DC1DB4688932F67F2F /* PikaSyncBG */,
 			);
 		};
 /* End PBXProject section */
@@ -174,21 +223,35 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F968DBE3C22AE4C792D02DC0 /* AssetLoader.swift in Sources */,
 				0B9E783212421D2B0EFEF2C6 /* ContactSheetRenderer.swift in Sources */,
 				0FD46C4808A9F5BE23C6F5B3 /* FaceEmbedder.swift in Sources */,
 				4DB1AAA2854A219EDA0B9FAE /* FaceEmbedding.mlpackage in Sources */,
 				464238A4ECA779125DF2CC71 /* FaceIDBridge.swift in Sources */,
 				CBED4365709F1372332B7359 /* JudgeClient.swift in Sources */,
 				A75359DA463DFA82116988D4 /* PeoplePickerView.swift in Sources */,
+				A6A9B1223B827877780F5AC4 /* PeopleScanner.swift in Sources */,
 				E605B4F905E539DDDFB8A77D /* PeopleStore.swift in Sources */,
 				62CEA496266926F5C1A1E4F7 /* PikaSyncApp.swift in Sources */,
 				D7274D2524D4EEF6EC912EB0 /* PipelineRunner.swift in Sources */,
 				2E9F6FBE19781CEAE9793174 /* PipelineView.swift in Sources */,
+				FD8BED19C2C1CB1428B1B09A /* RunStore.swift in Sources */,
 				E348A9CB8A2BE185DECBADC2 /* Secrets.swift in Sources */,
 				6D5CC45ABBE70DC547B06E4D /* SyncEngine.swift in Sources */,
 				D15C8F72DCEEF518BE85A0E7 /* SyncIntent.swift in Sources */,
 				DE994D60F440CA56D08ADCFD /* VisionScorer.swift in Sources */,
 				60D8005890AAE5E5248D5018 /* WakeLog.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA04E4DD7471B2CFEEC4023E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4A6B51980B3ED2C0AADEAB45 /* BGApp.swift in Sources */,
+				242FA215F37DDF754631646A /* SyncEngine.swift in Sources */,
+				3CBEB31C4A85617EADD25CEC /* SyncIntent.swift in Sources */,
+				258BEFA1C82C58DF046991A3 /* WakeLog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,6 +345,30 @@
 			};
 			name = Debug;
 		};
+		79974AD28FAC63ABA112BD20 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WWTV54KS97;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SourcesBG/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "PikaSync BG tests background access to your photo library.";
+				INFOPLIST_KEY_UIBackgroundModes = "fetch processing remote-notification";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.travisse.pikasync.bg;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		96042404E11B609EC3FA5A62 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -362,6 +449,30 @@
 			};
 			name = Release;
 		};
+		D9E358FA379E86DFE5A9CE9F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WWTV54KS97;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SourcesBG/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "PikaSync BG tests background access to your photo library.";
+				INFOPLIST_KEY_UIBackgroundModes = "fetch processing remote-notification";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.travisse.pikasync.bg;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -379,6 +490,15 @@
 			buildConfigurations = (
 				2C51BE6FECE4180C368A4AA3 /* Debug */,
 				96042404E11B609EC3FA5A62 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A9CF3AE291EB97C3462667C6 /* Build configuration list for PBXNativeTarget "PikaSyncBG" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79974AD28FAC63ABA112BD20 /* Debug */,
+				D9E358FA379E86DFE5A9CE9F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

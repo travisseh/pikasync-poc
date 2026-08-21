@@ -2,21 +2,41 @@ import SwiftUI
 
 /// "Who is this book about" — name the discovered people, star the ones the
 /// book must feature, exclude the ones it must never include. Persisted and
-/// applied to every generation.
+/// applied to every generation. Swipe to delete junk clusters.
 struct PeoplePickerView: View {
+    @ObservedObject var scanner: PeopleScanner
     @ObservedObject var store = PeopleStore.shared
 
     var body: some View {
         List {
-            if store.clusters.isEmpty {
-                Text("No people discovered yet. Run the pipeline once and faces will appear here.")
+            if scanner.scanning {
+                Section {
+                    ProgressView(value: scanner.progress)
+                    Text(scanner.statusText).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            if store.clusters.isEmpty && !scanner.scanning {
+                Text("No people discovered yet. Scan your photos or run a book and faces will appear here.")
                     .foregroundStyle(.secondary)
             }
-            ForEach(sorted) { cluster in
-                row(cluster)
+            Section(store.clusters.isEmpty ? "" : "★ = book is about them · ⃠ = never include") {
+                ForEach(sorted) { cluster in
+                    row(cluster)
+                }
+                .onDelete { idx in
+                    let ids = idx.map { sorted[$0].id }
+                    store.clusters.removeAll { ids.contains($0.id) }
+                    store.save()
+                }
             }
         }
         .navigationTitle("People")
+        .toolbar {
+            Button(scanner.scanning ? "Scanning…" : "Rescan") {
+                Task { await scanner.scan() }
+            }
+            .disabled(scanner.scanning)
+        }
         .onDisappear { store.save() }
     }
 
