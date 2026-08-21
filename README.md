@@ -48,3 +48,20 @@ first wake that saw it (ntfy timestamps give you all of this).
 WorkManager periodic job + READ_MEDIA_IMAGES is reliably wakeable — capability is a
 non-question; the risk is Play Store review policy (core-functionality justification).
 Build only if iOS proves out, or if the team wants parallel evidence for investors.
+
+## Photobook pipeline (on-device)
+
+The app now carries the full curation pipeline: month ingest -> Vision scoring
+(aesthetics/isUtility, faceCaptureQuality, feature prints; screenshots dropped
+via PHAssetMediaSubtype) -> ArcFace identity clustering (Core ML port of
+InsightFace w600k_mbf in Sources/Models/, alignment in FaceEmbedder.swift) ->
+burst dedup -> coverage shortlist (week floors, no-face quota, required-person
+guarantee + 45% cap, excluded-person drop) -> labeled contact sheets ->
+claude-sonnet-5 judge (key via gitignored Sources/Secrets.swift; see
+Secrets.example.swift.txt) -> swipeable book.
+
+People clusters persist in Documents/people.json and are editable in the
+People screen (name, star = required, exclude). Applied to every generation.
+
+License note: the bundled face model derives from InsightFace (non-commercial
+research license). POC only — production ships AuraFace or a licensed model.

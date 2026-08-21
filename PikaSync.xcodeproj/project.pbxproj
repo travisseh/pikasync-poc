@@ -8,8 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		0B9E783212421D2B0EFEF2C6 /* ContactSheetRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */; };
+		0FD46C4808A9F5BE23C6F5B3 /* FaceEmbedder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B093237EA24679EBDAB4454F /* FaceEmbedder.swift */; };
 		2E9F6FBE19781CEAE9793174 /* PipelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 914E68CA1E5E3FC3847853AB /* PipelineView.swift */; };
 		464238A4ECA779125DF2CC71 /* FaceIDBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */; };
+		4DB1AAA2854A219EDA0B9FAE /* FaceEmbedding.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = B61B3D54A90144B7B9F42955 /* FaceEmbedding.mlpackage */; };
 		60D8005890AAE5E5248D5018 /* WakeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAEDF624447F6C43243796F /* WakeLog.swift */; };
 		62CEA496266926F5C1A1E4F7 /* PikaSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF771AC045A10D44432855EB /* PikaSyncApp.swift */; };
 		6D5CC45ABBE70DC547B06E4D /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C79CFB46F1024878927C55 /* SyncEngine.swift */; };
@@ -33,6 +35,8 @@
 		914E68CA1E5E3FC3847853AB /* PipelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineView.swift; sourceTree = "<group>"; };
 		A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineRunner.swift; sourceTree = "<group>"; };
 		AF771AC045A10D44432855EB /* PikaSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikaSyncApp.swift; sourceTree = "<group>"; };
+		B093237EA24679EBDAB4454F /* FaceEmbedder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceEmbedder.swift; sourceTree = "<group>"; };
+		B61B3D54A90144B7B9F42955 /* FaceEmbedding.mlpackage */ = {isa = PBXFileReference; path = FaceEmbedding.mlpackage; sourceTree = "<group>"; };
 		C4D3EA9AFA6AD90013E1DD09 /* PikaSync.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikaSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSheetRenderer.swift; sourceTree = "<group>"; };
 		D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncIntent.swift; sourceTree = "<group>"; };
@@ -47,6 +51,7 @@
 			isa = PBXGroup;
 			children = (
 				D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */,
+				B093237EA24679EBDAB4454F /* FaceEmbedder.swift */,
 				E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */,
 				FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */,
 				DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */,
@@ -84,9 +89,18 @@
 				00C79CFB46F1024878927C55 /* SyncEngine.swift */,
 				D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */,
 				6EAEDF624447F6C43243796F /* WakeLog.swift */,
+				E9BED53581E4CA99C3448C61 /* Models */,
 				1511E44BBC47A67A1AEB148D /* Pipeline */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		E9BED53581E4CA99C3448C61 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B61B3D54A90144B7B9F42955 /* FaceEmbedding.mlpackage */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -161,6 +175,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B9E783212421D2B0EFEF2C6 /* ContactSheetRenderer.swift in Sources */,
+				0FD46C4808A9F5BE23C6F5B3 /* FaceEmbedder.swift in Sources */,
+				4DB1AAA2854A219EDA0B9FAE /* FaceEmbedding.mlpackage in Sources */,
 				464238A4ECA779125DF2CC71 /* FaceIDBridge.swift in Sources */,
 				CBED4365709F1372332B7359 /* JudgeClient.swift in Sources */,
 				A75359DA463DFA82116988D4 /* PeoplePickerView.swift in Sources */,

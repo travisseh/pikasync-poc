@@ -19,7 +19,9 @@ struct PersonCluster: Codable, Identifiable {
 
 final class PeopleStore: ObservableObject {
     static let shared = PeopleStore()
-    static let matchThreshold: Float = 0.45
+    // Same-person cosines measured on this library run 0.38-0.65; different
+    // adults < 0.05, worst adult-vs-baby 0.24. 0.32 splits those cleanly.
+    static let matchThreshold: Float = 0.32
 
     @Published var clusters: [PersonCluster] = []
 
