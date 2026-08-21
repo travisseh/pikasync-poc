@@ -8,6 +8,7 @@ struct PikaSyncApp: App {
 
     init() {
         SyncEngine.register()
+        SyncEngine.autoBookHook = { await AutoBook.generateIfDue() }
     }
 
     var body: some Scene {

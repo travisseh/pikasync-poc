@@ -56,13 +56,26 @@ enum SyncEngine {
         }
     }
 
+    /// Set by the main app only (nil in the BG test app): given the trigger,
+    /// runs the monthly auto-book generation and returns when done.
+    static var autoBookHook: (@MainActor () async -> Void)? = nil
+
     private static func handle(task: BGTask, trigger: String) {
         schedule()  // always re-schedule the next one first
         task.expirationHandler = {
             WakeLog.record(trigger: trigger, newPhotos: -1, totalPhotos: -1, note: "expired")
         }
         runSync(trigger: trigger)
-        task.setTaskCompleted(success: true)
+        // The processing task's budget (minutes) is what makes full book
+        // generation viable in the background — the core product question.
+        if trigger == "bg_processing", let hook = autoBookHook {
+            Task { @MainActor in
+                await hook()
+                task.setTaskCompleted(success: true)
+            }
+        } else {
+            task.setTaskCompleted(success: true)
+        }
     }
 
     static func schedule() {
