@@ -3,7 +3,7 @@ options:
   xcodeVersion: '15.4'
   bundleIdPrefix: com.travisse
   deploymentTarget:
-    iOS: "17.0"
+    iOS: "18.0"
 targets:
   PikaSync:
     type: application

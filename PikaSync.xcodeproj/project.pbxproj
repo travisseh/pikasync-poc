@@ -7,22 +7,57 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B9E783212421D2B0EFEF2C6 /* ContactSheetRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */; };
+		2E9F6FBE19781CEAE9793174 /* PipelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 914E68CA1E5E3FC3847853AB /* PipelineView.swift */; };
+		464238A4ECA779125DF2CC71 /* FaceIDBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */; };
 		60D8005890AAE5E5248D5018 /* WakeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAEDF624447F6C43243796F /* WakeLog.swift */; };
 		62CEA496266926F5C1A1E4F7 /* PikaSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF771AC045A10D44432855EB /* PikaSyncApp.swift */; };
 		6D5CC45ABBE70DC547B06E4D /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C79CFB46F1024878927C55 /* SyncEngine.swift */; };
+		A75359DA463DFA82116988D4 /* PeoplePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */; };
+		A7DB15953428C6938B99E4A0 /* Secrets.example.swift.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0642578F74527EE393AC9C5F /* Secrets.example.swift.txt */; };
+		CBED4365709F1372332B7359 /* JudgeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */; };
 		D15C8F72DCEEF518BE85A0E7 /* SyncIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */; };
+		D7274D2524D4EEF6EC912EB0 /* PipelineRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */; };
+		DE994D60F440CA56D08ADCFD /* VisionScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3381FEE037C5170449DEAD88 /* VisionScorer.swift */; };
+		E348A9CB8A2BE185DECBADC2 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06985FAD552338141D65F423 /* Secrets.swift */; };
+		E605B4F905E539DDDFB8A77D /* PeopleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED070F39260B1772B9FB974C /* PeopleStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		00C79CFB46F1024878927C55 /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
+		0642578F74527EE393AC9C5F /* Secrets.example.swift.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Secrets.example.swift.txt; sourceTree = "<group>"; };
+		06985FAD552338141D65F423 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		3381FEE037C5170449DEAD88 /* VisionScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionScorer.swift; sourceTree = "<group>"; };
 		507E9248D4787B1306685615 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6EAEDF624447F6C43243796F /* WakeLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WakeLog.swift; sourceTree = "<group>"; };
+		914E68CA1E5E3FC3847853AB /* PipelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineView.swift; sourceTree = "<group>"; };
+		A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineRunner.swift; sourceTree = "<group>"; };
 		AF771AC045A10D44432855EB /* PikaSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikaSyncApp.swift; sourceTree = "<group>"; };
 		C4D3EA9AFA6AD90013E1DD09 /* PikaSync.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikaSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSheetRenderer.swift; sourceTree = "<group>"; };
 		D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncIntent.swift; sourceTree = "<group>"; };
+		DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeoplePickerView.swift; sourceTree = "<group>"; };
+		E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceIDBridge.swift; sourceTree = "<group>"; };
+		ED070F39260B1772B9FB974C /* PeopleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleStore.swift; sourceTree = "<group>"; };
+		FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JudgeClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		1511E44BBC47A67A1AEB148D /* Pipeline */ = {
+			isa = PBXGroup;
+			children = (
+				D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */,
+				E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */,
+				FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */,
+				DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */,
+				ED070F39260B1772B9FB974C /* PeopleStore.swift */,
+				A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */,
+				914E68CA1E5E3FC3847853AB /* PipelineView.swift */,
+				3381FEE037C5170449DEAD88 /* VisionScorer.swift */,
+			);
+			path = Pipeline;
+			sourceTree = "<group>";
+		};
 		3D161EA72F20D00AC0B31653 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -44,9 +79,12 @@
 			children = (
 				507E9248D4787B1306685615 /* Info.plist */,
 				AF771AC045A10D44432855EB /* PikaSyncApp.swift */,
+				0642578F74527EE393AC9C5F /* Secrets.example.swift.txt */,
+				06985FAD552338141D65F423 /* Secrets.swift */,
 				00C79CFB46F1024878927C55 /* SyncEngine.swift */,
 				D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */,
 				6EAEDF624447F6C43243796F /* WakeLog.swift */,
+				1511E44BBC47A67A1AEB148D /* Pipeline */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -59,6 +97,7 @@
 			buildConfigurationList = 1A3C3F1ED827DF9DE6B348E8 /* Build configuration list for PBXNativeTarget "PikaSync" */;
 			buildPhases = (
 				B90130747C21966512F0FF85 /* Sources */,
+				FB6C851ACA55BCE146BD6253 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -105,14 +144,34 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		FB6C851ACA55BCE146BD6253 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A7DB15953428C6938B99E4A0 /* Secrets.example.swift.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		B90130747C21966512F0FF85 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B9E783212421D2B0EFEF2C6 /* ContactSheetRenderer.swift in Sources */,
+				464238A4ECA779125DF2CC71 /* FaceIDBridge.swift in Sources */,
+				CBED4365709F1372332B7359 /* JudgeClient.swift in Sources */,
+				A75359DA463DFA82116988D4 /* PeoplePickerView.swift in Sources */,
+				E605B4F905E539DDDFB8A77D /* PeopleStore.swift in Sources */,
 				62CEA496266926F5C1A1E4F7 /* PikaSyncApp.swift in Sources */,
+				D7274D2524D4EEF6EC912EB0 /* PipelineRunner.swift in Sources */,
+				2E9F6FBE19781CEAE9793174 /* PipelineView.swift in Sources */,
+				E348A9CB8A2BE185DECBADC2 /* Secrets.swift in Sources */,
 				6D5CC45ABBE70DC547B06E4D /* SyncEngine.swift in Sources */,
 				D15C8F72DCEEF518BE85A0E7 /* SyncIntent.swift in Sources */,
+				DE994D60F440CA56D08ADCFD /* VisionScorer.swift in Sources */,
 				60D8005890AAE5E5248D5018 /* WakeLog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -195,7 +254,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -252,7 +311,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

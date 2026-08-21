@@ -51,6 +51,10 @@ struct ContentView: View {
                         .font(.caption).foregroundStyle(.secondary)
                         .textSelection(.enabled)
                 }
+                Section("Photobook") {
+                    NavigationLink("Photobook pipeline") { PipelineView() }
+                    NavigationLink("People") { PeoplePickerView() }
+                }
                 Section("Wake log (\(events.count))") {
                     if events.isEmpty {
                         Text("No wakes recorded yet").foregroundStyle(.secondary)

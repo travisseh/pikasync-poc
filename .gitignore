@@ -2,3 +2,4 @@ build/
 *.xcuserdata/
 xcuserdata/
 .DS_Store
+Sources/Secrets.swift
