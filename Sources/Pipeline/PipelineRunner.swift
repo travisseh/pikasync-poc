@@ -147,7 +147,21 @@ final class PipelineRunner: ObservableObject {
             t0 = Date()
             status = "judging (claude-sonnet-5)"
             let monthName = DateFormatter.localizedString(from: start, dateStyle: .medium, timeStyle: .none)
-            let result = try await JudgeClient.judge(sheets: sheets, monthLabel: monthName, count: min(Self.bookSize, chosen.count), maxIndex: chosen.count - 1)
+            // Never ask for a book the pool can't support: judge needs real
+            // choice (~2.5x) or it's forced into near-twins (proven in eval).
+            let bookCount = min(Self.bookSize, max(8, chosen.count * 5 / 12))
+            var result = try await JudgeClient.judge(sheets: sheets, monthLabel: monthName, count: bookCount, maxIndex: chosen.count - 1)
+
+            // Deterministic same-scene check on the judge's picks: prompt rules
+            // bend under pool pressure, feature-print math doesn't. One retry.
+            let violations = sceneViolations(result.book, chosen: chosen)
+            if !violations.isEmpty {
+                let detail = violations.map { "picks \($0.0) and \($0.1) are the same scene — replace one of each pair" }.joined(separator: "; ")
+                status = "judge re-pick (\(violations.count) same-scene pairs)"
+                result = try await JudgeClient.judge(sheets: sheets, monthLabel: monthName, count: bookCount, maxIndex: chosen.count - 1, correction: detail)
+                let remaining = sceneViolations(result.book, chosen: chosen)
+                record("scene re-pick", since: t0, remaining.isEmpty ? "clean after retry" : "\(remaining.count) pairs still similar (accepted)")
+            }
             record("LLM judge", since: t0, result.usageSummary)
             judgeInfo = result.usageSummary
             book = result.book
@@ -171,6 +185,25 @@ final class PipelineRunner: ObservableObject {
             errorText = "\(error)"
             status = "failed"
         }
+    }
+
+    /// Pairs of picked shortlist indexes that are the same scene by feature-print
+    /// similarity within the scene window.
+    private func sceneViolations(_ book: BookResult, chosen: [PhotoScore]) -> [(Int, Int)] {
+        let byIdx = Dictionary(uniqueKeysWithValues: chosen.compactMap { s in s.shortlistIndex.map { ($0, s) } })
+        let picks = book.selections.map(\.index)
+        var out: [(Int, Int)] = []
+        for i in 0..<picks.count {
+            for j in (i + 1)..<picks.count {
+                guard let a = byIdx[picks[i]], let b = byIdx[picks[j]],
+                      let fa = a.featurePrint, let fb = b.featurePrint,
+                      let da = a.date, let db = b.date,
+                      abs(da.timeIntervalSince(db)) <= Self.sceneWindowHours * 3600,
+                      VisionScorer.cosine(fa, fb) >= Self.sceneSim else { continue }
+                out.append((picks[i], picks[j]))
+            }
+        }
+        return out
     }
 
     private func composite(_ s: PhotoScore) -> Float {

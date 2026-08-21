@@ -23,7 +23,7 @@ enum JudgeClient {
         let usageSummary: String
     }
 
-    static func judge(sheets: [UIImage], monthLabel: String, count: Int, maxIndex: Int) async throws -> JudgeOutput {
+    static func judge(sheets: [UIImage], monthLabel: String, count: Int, maxIndex: Int, correction: String? = nil) async throws -> JudgeOutput {
         let prompt = """
         You are choosing photos for a printed monthly family photobook the parents will keep forever.
 
@@ -34,12 +34,13 @@ enum JudgeClient {
         - Balance the people; labeled names are the family this book is about — strongly prefer photos of them
         - Include 2-4 non-people shots ONLY if they clearly add story (a place, trip, event, or milestone); skip mundane food, objects, and receipts unless visually exceptional
         - Prefer emotional resonance and storytelling over technical perfection
-        - Never pick two photos of the same scene/moment
+        - Never pick two photos of the same scene/moment, and at most 2 photos from the same location or session across the whole book — even with different people in them
         - Captions must state only what is visibly in the photo; never invent names, events, relationships, or activities you cannot see
 
         Respond with ONLY a JSON object, no other text:
         {"title": "short book title", "cover_index": <index>, "selections": [{"index": <int>, "page": <1-\(count) in book order>, "caption": "<=8 words, factual"}]}
         The selections array must contain exactly \(count) entries with distinct indexes.
+        \(correction.map { "\nIMPORTANT CORRECTION — your previous answer had these problems, fix them while keeping everything else:\n\($0)" } ?? "")
         """
 
         var content: [[String: Any]] = []
