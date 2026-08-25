@@ -13,6 +13,35 @@ enum ShareClient {
         let shareID: String
     }
 
+    /// Idempotent share: returns the cached link, or uploads once and persists
+    /// it on the run. Safe to call from anywhere (UI, pipeline, background).
+    @MainActor
+    static func ensureShared(runID: UUID, progress: @MainActor @escaping (String) -> Void = { _ in }) async -> ShareResult? {
+        guard let run = RunStore.shared.runs.first(where: { $0.id == runID }) else { return nil }
+        if let url = run.shareURL, let id = run.shareID {
+            return ShareResult(url: url, shareID: id)
+        }
+        do {
+            let result = try await upload(run: run, progress: progress)
+            RunStore.shared.setShare(id: runID, shareURL: result.url, shareID: result.shareID)
+            return result
+        } catch {
+            return nil
+        }
+    }
+
+    /// App-open sweep: share anything that missed its auto-share (background
+    /// runs cut short, network failures). One at a time, quiet.
+    @MainActor
+    static func sweepUnshared() async {
+        #if DEBUG
+        if ProcessInfo.processInfo.environment["PIKA_MOCK"] == "1" { return }
+        #endif
+        for run in RunStore.shared.runs where run.shareURL == nil {
+            _ = await ensureShared(runID: run.id)
+        }
+    }
+
     static func upload(run: SavedRun, progress: @MainActor @escaping (String) -> Void) async throws -> ShareResult {
         // Page 0 is the cover; book pages follow in order.
         let ordered = [run.coverAssetID] + run.selections.sorted { $0.page < $1.page }.map(\.assetID)

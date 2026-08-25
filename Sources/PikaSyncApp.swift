@@ -9,6 +9,13 @@ struct PikaSyncApp: App {
     init() {
         SyncEngine.register()
         SyncEngine.autoBookHook = { trigger in await AutoBook.tick(trigger: trigger) }
+
+        // Normal solid bottom nav: white, hairline top edge.
+        let tabAppearance = UITabBarAppearance()
+        tabAppearance.configureWithOpaqueBackground()
+        tabAppearance.backgroundColor = .white
+        UITabBar.appearance().standardAppearance = tabAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabAppearance
     }
 
     var body: some Scene {
@@ -21,6 +28,7 @@ struct PikaSyncApp: App {
                 SyncEngine.schedule()
             } else if phase == .active {
                 RemoteCommand.checkAndRun()
+                Task { await ShareClient.sweepUnshared() }
             }
         }
     }
@@ -66,6 +74,9 @@ struct BooksTab: View {
     @ObservedObject var scanner: PeopleScanner
     @ObservedObject private var runStore = RunStore.shared
     @ObservedObject private var people = PeopleStore.shared
+    @ObservedObject private var coordinator = CreateCoordinator.shared
+    @State private var showCreate = false
+    @State private var progressBuild: CreateCoordinator.Build?
     #if DEBUG
     @State private var autoOpenBook = false
     @State private var autoOpenPipeline = false
@@ -79,8 +90,18 @@ struct BooksTab: View {
                         welcomeCard
                     }
 
-                    if runStore.runs.isEmpty {
+                    if runStore.runs.isEmpty && coordinator.builds.isEmpty {
                         emptyState
+                    }
+
+                    ForEach(coordinator.builds) { build in
+                        Button {
+                            progressBuild = build
+                        } label: {
+                            BuildingCard(build: build)
+                        }
+                        .buttonStyle(PressCardStyle())
+                        .transition(.move(edge: .top).combined(with: .opacity))
                     }
 
                     ForEach(runStore.runs) { run in
@@ -106,16 +127,14 @@ struct BooksTab: View {
             }
             .background(Pika.bg)
             .navigationTitle("Your books")
-            .safeAreaInset(edge: .bottom) {
-                NavigationLink {
-                    PipelineView()
-                } label: {
-                    Label("Create a book", systemImage: "plus")
-                }
-                .buttonStyle(PillButtonStyle())
-                .pikaShadow()
-                .padding(.horizontal, 20)
-                .padding(.top, 4)
+            .overlay(alignment: .bottomTrailing) {
+                CreateFAB { showCreate = true }
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 16)
+            }
+            .sheet(isPresented: $showCreate) { CreateSheet() }
+            .sheet(item: $progressBuild) { build in
+                BuildProgressSheet(build: build)
             }
             #if DEBUG
             .navigationDestination(isPresented: $autoOpenBook) {
@@ -123,7 +142,17 @@ struct BooksTab: View {
             }
             .task {
                 let screen = ProcessInfo.processInfo.environment["PIKA_SCREEN"]
-                guard ["book", "actions", "feedback", "delete", "pipeline"].contains(screen ?? "") else { return }
+                if screen == "create" { showCreate = true; return }
+                if screen == "building" {
+                    let build = CreateCoordinator.Build(month: Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
+                    build.runner.status = "scoring 62/206"
+                    build.runner.stageTimes = [
+                        .init(name: "scoring", seconds: 4.2, detail: "206 in month, 62 newly scored"),
+                    ]
+                    coordinator.builds = [build]
+                    return
+                }
+                guard ["book", "actions", "feedback", "delete", "pipeline", "detail", "spread"].contains(screen ?? "") else { return }
                 for _ in 0..<50 where runStore.runs.isEmpty {
                     try? await Task.sleep(for: .milliseconds(200))
                 }
@@ -220,41 +249,38 @@ struct BookCard: View {
 struct SavedBookView: View {
     let run: SavedRun
     @State private var images: [String: UIImage] = [:]
-    @State private var currentPage = -1
+    @State private var unit = 0
     @State private var shareURL: String?
     @State private var shareID: String?
     @State private var shareStatus: String?
     @State private var showShareSheet = false
     @State private var showFeedback = false
     @State private var showActions = false
+    @State private var showPipelineDetails = false
     @State private var confirmDelete = false
+    @State private var detail: PageDetail?
     @Environment(\.dismiss) private var dismiss
 
+    struct PageDetail: Identifiable {
+        let assetID: String
+        let page: Int
+        var id: Int { page }
+    }
+
     private var pages: [SavedRun.Selection] { run.selections.sorted { $0.page < $1.page } }
+    /// Pages after the title page, paired into spreads.
+    private var spreads: [[SavedRun.Selection]] {
+        stride(from: 0, to: pages.count, by: 2).map { Array(pages[$0..<min($0 + 2, pages.count)]) }
+    }
 
     var body: some View {
-        TabView(selection: $currentPage) {
-            // Cover
-            VStack(spacing: 20) {
-                photo(run.coverAssetID)
-                Text(run.title)
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundStyle(Pika.ink)
-                    .multilineTextAlignment(.center)
-                Text(run.monthLabel)
-                    .font(.system(size: 15))
-                    .foregroundStyle(Pika.inkSecondary)
-            }
-            .padding(20).tag(-1)
-
-            ForEach(pages, id: \.page) { sel in
-                VStack(spacing: 14) {
-                    photo(sel.assetID)
-                    Text("\(sel.page) of \(pages.count)")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Pika.inkSecondary)
+        TabView(selection: $unit) {
+            titlePage.tag(0)
+            ForEach(Array(spreads.enumerated()), id: \.offset) { i, pair in
+                SpreadView(pair: pair, images: images) { sel in
+                    detail = PageDetail(assetID: sel.assetID, page: sel.page)
                 }
-                .padding(20).tag(sel.page)
+                .tag(i + 1)
             }
         }
         .tabViewStyle(.page(indexDisplayMode: .automatic))
@@ -288,6 +314,7 @@ struct SavedBookView: View {
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: shareStatus)
         .sheet(isPresented: $showActions) { actionsSheet }
         .sheet(isPresented: $confirmDelete) { deleteSheet }
+        .sheet(isPresented: $showPipelineDetails) { pipelineDetailsSheet }
         .sheet(isPresented: $showShareSheet) {
             if let shareURL, let url = URL(string: shareURL) {
                 ActivityView(items: [url])
@@ -295,12 +322,16 @@ struct SavedBookView: View {
         }
         .sheet(isPresented: $showFeedback) {
             if let shareID {
-                FeedbackSheet(shareID: shareID,
-                              page: currentPage == -1 ? 0 : currentPage,
-                              pageLabel: currentPage == -1 ? "cover" : "page \(currentPage)")
+                FeedbackSheet(shareID: shareID, page: nil, pageLabel: "this book")
                     .presentationDetents([.medium])
                     .presentationCornerRadius(Pika.sheetRadius)
             }
+        }
+        .fullScreenCover(item: $detail) { d in
+            PhotoDetailView(
+                image: images[d.assetID],
+                page: d.page,
+                ensureShareID: { await ensureShared() ? shareID : nil })
         }
         .task {
             shareURL = run.shareURL
@@ -312,25 +343,60 @@ struct SavedBookView: View {
             case "actions": showActions = true
             case "delete": confirmDelete = true
             case "feedback": shareID = shareID ?? "mock-design-preview"; showFeedback = true
+            case "detail":
+                if let first = pages.first { detail = PageDetail(assetID: first.assetID, page: first.page) }
+            case "spread":
+                unit = 1
             default: break
             }
             #endif
         }
     }
 
-    @ViewBuilder
-    private func photo(_ assetID: String) -> some View {
-        if let img = images[assetID] {
-            Image(uiImage: img)
-                .resizable().scaledToFit()
-                .clipShape(RoundedRectangle(cornerRadius: Pika.cardRadius))
+    /// Title page: one square photo + the book title, like a printed cover.
+    private var titlePage: some View {
+        VStack(spacing: 24) {
+            SquarePhoto(image: images[run.coverAssetID])
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding(.horizontal, 36)
                 .pikaShadow()
-        } else {
-            RoundedRectangle(cornerRadius: Pika.cardRadius)
-                .fill(Pika.bgSoft)
-                .aspectRatio(4 / 3, contentMode: .fit)
-                .overlay(ProgressView())
+                .onTapGesture {
+                    detail = PageDetail(assetID: run.coverAssetID, page: 0)
+                }
+            VStack(spacing: 6) {
+                Text(run.title)
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundStyle(Pika.ink)
+                    .multilineTextAlignment(.center)
+                Text(run.monthLabel)
+                    .font(.system(size: 15))
+                    .foregroundStyle(Pika.inkSecondary)
+            }
+            .padding(.horizontal, 24)
         }
+        .padding(.vertical, 20)
+    }
+
+    private var pipelineDetailsSheet: some View {
+        VStack(spacing: 14) {
+            Capsule().fill(Pika.hairline).frame(width: 36, height: 4).padding(.top, 10)
+            Text("Pipeline details")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(Pika.ink)
+            ScrollView {
+                StageListView(stages: run.stages ?? [], judgeInfo: run.judgeInfo)
+                    .padding(.horizontal, 20)
+                if run.stages == nil {
+                    Text("No stage data for this book (made before pipeline details were saved).")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Pika.inkSecondary)
+                        .padding(20)
+                }
+            }
+        }
+        .background(Pika.bg)
+        .presentationDetents([.medium, .large])
+        .presentationCornerRadius(Pika.sheetRadius)
     }
 
     private var actionsSheet: some View {
@@ -354,8 +420,15 @@ struct SavedBookView: View {
                     showActions = false
                     Task { await openFeedback() }
                 } label: {
-                    Label(currentPage == -1 ? "Feedback on cover" : "Feedback on page \(currentPage)",
-                          systemImage: "bubble.left")
+                    Label("Feedback on this book", systemImage: "bubble.left")
+                }
+                .buttonStyle(PillButtonStyle(filled: false))
+
+                Button {
+                    showActions = false
+                    showPipelineDetails = true
+                } label: {
+                    Label("Pipeline details", systemImage: "wrench.and.screwdriver")
                 }
                 .buttonStyle(PillButtonStyle(filled: false))
 
@@ -374,7 +447,7 @@ struct SavedBookView: View {
             .padding(.top, 8)
             Spacer(minLength: 12)
         }
-        .presentationDetents([.height(276)])
+        .presentationDetents([.height(338)])
         .presentationCornerRadius(Pika.sheetRadius)
         .background(Pika.bg)
     }
@@ -426,21 +499,147 @@ struct SavedBookView: View {
         showFeedback = true
     }
 
-    /// Uploads once, caches the link on the run; returns false on failure.
+    /// Uploads once (via the shared idempotent path), caches the link.
     private func ensureShared() async -> Bool {
         if shareURL != nil, shareID != nil { return true }
-        do {
-            let result = try await ShareClient.upload(run: run) { shareStatus = $0 }
+        if let result = await ShareClient.ensureShared(runID: run.id, progress: { shareStatus = $0 }) {
             shareStatus = nil
             shareURL = result.url
             shareID = result.shareID
-            RunStore.shared.setShare(id: run.id, shareURL: result.url, shareID: result.shareID)
             return true
-        } catch {
-            shareStatus = "share failed: \(error)"
-            try? await Task.sleep(for: .seconds(4))
-            shareStatus = nil
-            return false
+        }
+        shareStatus = "share failed — check your connection"
+        try? await Task.sleep(for: .seconds(4))
+        shareStatus = nil
+        return false
+    }
+}
+
+// MARK: - Spread layout (square photos, two per page like a printed book)
+
+/// Square crop, top-anchored so faces survive the crop.
+struct SquarePhoto: View {
+    let image: UIImage?
+
+    var body: some View {
+        Color.clear
+            .aspectRatio(1, contentMode: .fit)
+            .overlay {
+                if let image {
+                    GeometryReader { geo in
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
+                            .clipped()
+                    }
+                } else {
+                    Pika.bgSoft.overlay(ProgressView())
+                }
+            }
+            .clipped()
+    }
+}
+
+/// One spread: two squares side by side on a white "page" card.
+struct SpreadView: View {
+    let pair: [SavedRun.Selection]
+    let images: [String: UIImage]
+    let onTap: (SavedRun.Selection) -> Void
+
+    var body: some View {
+        VStack {
+            Spacer()
+            HStack(spacing: 10) {
+                ForEach(pair, id: \.page) { sel in
+                    Button { onTap(sel) } label: {
+                        SquarePhoto(image: images[sel.assetID])
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    .buttonStyle(PressCardStyle())
+                }
+                if pair.count == 1 {
+                    // Last odd page: blank facing page keeps the book feel.
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Pika.bgSoft)
+                        .aspectRatio(1, contentMode: .fit)
+                }
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: Pika.cardRadius)
+                    .fill(.white)
+            )
+            .pikaShadow()
+            .padding(.horizontal, 16)
+            Spacer()
+        }
+    }
+}
+
+/// Tap a square → the photo full size (uncropped) with per-photo feedback.
+struct PhotoDetailView: View {
+    let image: UIImage?
+    let page: Int
+    let ensureShareID: () async -> String?
+    @State private var shareID: String?
+    @State private var showFeedback = false
+    @State private var preparing = false
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            Pika.bg.ignoresSafeArea()
+            VStack {
+                Spacer()
+                if let image {
+                    Image(uiImage: image)
+                        .resizable().scaledToFit()
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .pikaShadow()
+                        .padding(.horizontal, 16)
+                } else {
+                    ProgressView()
+                }
+                Spacer()
+                Button {
+                    Task {
+                        preparing = true
+                        shareID = await ensureShareID()
+                        preparing = false
+                        if shareID != nil { showFeedback = true }
+                    }
+                } label: {
+                    if preparing {
+                        ProgressView().tint(.white).frame(maxWidth: .infinity).frame(height: 52)
+                            .background(Capsule().fill(Pika.accent))
+                    } else {
+                        Label("Feedback on this photo", systemImage: "bubble.left")
+                    }
+                }
+                .buttonStyle(PillButtonStyle())
+                .padding(.horizontal, 20)
+                .padding(.bottom, 16)
+            }
+
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Pika.ink)
+                    .frame(width: 36, height: 36)
+                    .background(Circle().fill(Pika.bgSoft))
+            }
+            .padding(16)
+        }
+        .sheet(isPresented: $showFeedback) {
+            if let shareID {
+                FeedbackSheet(shareID: shareID, page: page,
+                              pageLabel: page == 0 ? "cover" : "photo \(page)")
+                    .presentationDetents([.medium])
+                    .presentationCornerRadius(Pika.sheetRadius)
+            }
         }
     }
 }
@@ -449,7 +648,7 @@ struct SavedBookView: View {
 /// that share-link viewers write to.
 struct FeedbackSheet: View {
     let shareID: String
-    let page: Int
+    let page: Int?
     let pageLabel: String
     @State private var reaction: String?
     @State private var text = ""

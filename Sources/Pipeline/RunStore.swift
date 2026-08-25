@@ -8,6 +8,11 @@ struct SavedRun: Codable, Identifiable {
         let page: Int
         var caption: String? = nil  // legacy runs only; new books have no captions
     }
+    struct Stage: Codable {
+        let name: String
+        let detail: String
+        let seconds: Double
+    }
     let id: UUID
     let createdAt: Date
     let monthLabel: String
@@ -19,6 +24,7 @@ struct SavedRun: Codable, Identifiable {
     var coverThumbJPEG: Data?
     var shareURL: String? = nil  // cached share link once uploaded
     var shareID: String? = nil   // Convex shareId (feedback capability token)
+    var stages: [Stage]? = nil   // pipeline details, viewable from the "…" menu
 }
 
 final class RunStore: ObservableObject {

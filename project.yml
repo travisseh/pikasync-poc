@@ -27,6 +27,8 @@ targets:
         NSPhotoLibraryUsageDescription: "PikaSync tests background access to your photo library."
         UIBackgroundModes: [fetch, processing, remote-notification]
         ITSAppUsesNonExemptEncryption: false
+        # Normal (opaque, docked) bottom tab bar instead of iOS 26 liquid glass.
+        UIDesignRequiresCompatibility: true
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         UISupportedInterfaceOrientations~ipad:
           - UIInterfaceOrientationPortrait

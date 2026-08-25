@@ -162,12 +162,21 @@ final class PipelineRunner: ObservableObject {
             }
             if let coverID = byIndex[result.book.cover_index] {
                 let thumb = await loadThumbs(ids: [coverID], size: CGSize(width: 600, height: 600))[coverID]
-                RunStore.shared.add(SavedRun(
+                let saved = SavedRun(
                     id: UUID(), createdAt: Date(), monthLabel: monthName,
                     title: result.book.title, coverAssetID: coverID, selections: sels,
                     totalSeconds: stageTimes.reduce(0) { $0 + $1.seconds },
                     judgeInfo: result.usageSummary,
-                    coverThumbJPEG: thumb?.jpegData(compressionQuality: 0.8)))
+                    coverThumbJPEG: thumb?.jpegData(compressionQuality: 0.8),
+                    stages: stageTimes.map { .init(name: $0.name, detail: $0.detail, seconds: $0.seconds) })
+                RunStore.shared.add(saved)
+
+                // Auto-share: every book becomes shareable/feedback-able the
+                // moment it exists. Best-effort — a failure here never fails
+                // the run; the app-open sweep retries any unshared book.
+                status = "sharing your book…"
+                _ = await ShareClient.ensureShared(runID: saved.id) { [weak self] in self?.status = $0 }
+                status = "done — \(result.book.selections.count)-photo book ready"
             }
         } catch {
             errorText = "\(error)"

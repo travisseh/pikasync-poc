@@ -173,9 +173,6 @@ struct BookView: View {
                                 .aspectRatio(4 / 3, contentMode: .fit)
                                 .overlay(ProgressView())
                         }
-                        Text("\(sel.page) of \(pages.count)")
-                            .font(.system(size: 13))
-                            .foregroundStyle(Pika.inkSecondary)
                     }
                     .padding(20)
                     .tag(sel.page)

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0362D6C88E3DDAF258E7CD3C /* CreateFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D09156D78D7CF7FF364716 /* CreateFlow.swift */; };
 		0B9E783212421D2B0EFEF2C6 /* ContactSheetRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */; };
 		0FD46C4808A9F5BE23C6F5B3 /* FaceEmbedder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B093237EA24679EBDAB4454F /* FaceEmbedder.swift */; };
 		242FA215F37DDF754631646A /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C79CFB46F1024878927C55 /* SyncEngine.swift */; };
@@ -53,6 +54,7 @@
 		73BA830477CF75E6FDC4F375 /* IncrementalScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncrementalScorer.swift; sourceTree = "<group>"; };
 		74AAFE69AD28336C82801908 /* AssetLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetLoader.swift; sourceTree = "<group>"; };
 		772082287A77A4A9769987DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		83D09156D78D7CF7FF364716 /* CreateFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateFlow.swift; sourceTree = "<group>"; };
 		86608F9EE1B1871912091AB3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8C0A3AF8C41D8EF6B382BBBB /* PikaSyncBG.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikaSyncBG.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		914E68CA1E5E3FC3847853AB /* PipelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineView.swift; sourceTree = "<group>"; };
@@ -80,6 +82,7 @@
 				74AAFE69AD28336C82801908 /* AssetLoader.swift */,
 				FB66E6C656A87E221C65E6D1 /* AutoBook.swift */,
 				D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */,
+				83D09156D78D7CF7FF364716 /* CreateFlow.swift */,
 				B093237EA24679EBDAB4454F /* FaceEmbedder.swift */,
 				E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */,
 				73BA830477CF75E6FDC4F375 /* IncrementalScorer.swift */,
@@ -248,6 +251,7 @@
 				F968DBE3C22AE4C792D02DC0 /* AssetLoader.swift in Sources */,
 				E0AF3797B6E6AC8173ACABD6 /* AutoBook.swift in Sources */,
 				0B9E783212421D2B0EFEF2C6 /* ContactSheetRenderer.swift in Sources */,
+				0362D6C88E3DDAF258E7CD3C /* CreateFlow.swift in Sources */,
 				0FD46C4808A9F5BE23C6F5B3 /* FaceEmbedder.swift in Sources */,
 				4DB1AAA2854A219EDA0B9FAE /* FaceEmbedding.mlpackage in Sources */,
 				464238A4ECA779125DF2CC71 /* FaceIDBridge.swift in Sources */,

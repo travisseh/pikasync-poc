@@ -32,6 +32,40 @@ feel: white, image-forward, soft depth, friendly type, sheets over alerts.
 - **Empty states**: friendly headline + one-line body + primary pill. Never bare gray text.
 - **Dev surfaces** (pipeline/sync screens): same palette, plain lists are fine — light touch.
 
+## Navigation & create flow (v2)
+
+- **Bottom nav**: NORMAL docked opaque bar (white, hairline top edge, accent
+  selected state). No floating/liquid-glass bar. Springy screen transitions
+  stay where cheap.
+- **FAB**: 56pt accent circle with a white plus, bottom-right, floating above
+  the nav bar (20 right / 16 bottom inside the content area). This is the only
+  create entry point — no "Create a book" pill in the list.
+- **Create sheet**: FAB opens a bottom sheet titled "Create Photobook" — a
+  2-column grid of the last 12 months as selectable chips (accent tint 10% +
+  accent stroke when selected) and a full-width accent "Create" pill.
+- **In-list loading entry**: Create inserts a card at the TOP of the Books
+  list: soft bgSoft card (~148pt) with a moving shimmer highlight, month label
+  and the live stage text. Tap → bottom sheet with the live dev stage list.
+  Failure keeps the card ("Couldn't make this book — tap for details") with a
+  Try again + Remove in its sheet. Success: the card is replaced by the normal
+  cover card.
+- **Pipeline details**: a finished book's "…" sheet has "Pipeline details" —
+  the persisted stage list (name, detail, seconds, total, judge usage).
+- **Auto-share**: every book uploads to the share backend automatically right
+  after it's created (interactive and background); failures retry via an
+  app-open sweep. Feedback is therefore never gated on a manual share.
+
+## Book viewer spreads (v2)
+
+- All photos display as SQUARES (top-anchored center crop so faces survive).
+- Unit 1 is the **title page**: one square + title + month, like a printed
+  cover. Every following unit is a **spread**: TWO squares side by side on a
+  white page card (10 gap, 14 padding, radius 16, soft shadow). An odd final
+  page gets a blank bgSoft facing square.
+- Tap any square → the photo FULL SIZE, uncropped, on white, with an X close
+  and a "Feedback on this photo" accent pill (per-photo feedback).
+- No page numbers anywhere ("N of M" is gone). Page dots only.
+
 ## Naming
 
 iOS: `Pika.bg`, `Pika.ink`, `Pika.accent`… in `Sources/Theme.swift`.
