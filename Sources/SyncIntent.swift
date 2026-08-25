@@ -10,6 +10,12 @@ struct SyncPhotosIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         SyncEngine.runSync(trigger: "shortcut")
+        // Main app only (hook is nil in the BG test app): the nightly shortcut
+        // is the most reliable wake we have, so let it also drive the monthly
+        // book. The once-per-month marker makes this idempotent.
+        if let hook = SyncEngine.autoBookHook {
+            await hook("shortcut")
+        }
         return .result()
     }
 }
