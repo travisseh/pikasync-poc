@@ -1,67 +1,86 @@
-# PikaSync POC
+# PikaSync (iOS POC)
 
-**The question:** can an iOS app get ongoing access to new photos WITHOUT the user
-opening it? This is the make-or-break for the Pikabook subscription-autopilot premise.
+Pikabook proof of concept: **can a phone automatically turn a month of photos into a
+printable photobook, in the background, for pennies?** This repo is the iOS half
+(Android twin: [pikasync-android](https://github.com/travisseh/pikasync-android)).
 
-## What it does
+Status: yes on quality (7 consecutive months of printable books from a real
+library), yes on cost (~$0.05–0.15/book at POC, $0.01–0.05 with Haiku/Batch), and
+yes-with-architecture on background (see wake strategy below).
 
-On every wake (any trigger), it queries the photo library for photos created since
-the last sync marker, then logs the event two ways:
-- locally (visible in the app's Wake Log)
-- as a push message to **https://ntfy.sh/pikasync-poc-trav-8347** (open that URL or
-  install the ntfy app and subscribe — every background wake shows up there, so you
-  can watch the experiment from any device with zero server setup)
+## Architecture
 
-## Experiment arms
+Everything heavy runs **on-device**; only ~3 small contact-sheet JPEGs leave the
+phone, judged by a tiny Vercel function that holds the Anthropic key
+(`server/`, deployed at `https://pikasync-judge.vercel.app/api/judge`).
 
-1. **BGAppRefreshTask** — asks iOS for a wake every ~4h. iOS grants opportunistically
-   based on usage patterns. This is the "true autonomy" arm.
-2. **BGProcessingTask** — asks for a longer nightly task (network required). Second
-   autonomy arm; iOS tends to run these when charging.
-3. **Shortcuts automation** — set up once: Shortcuts app → Automation → Time of Day
-   (daily 9pm) → Run Immediately → "Sync Photos Now". Runs without opening the app.
-   This is the "guided setup" fallback arm.
-4. *(Phase 2, not built)* **Silent push** — APNs `content-available` wake. Needs paid
-   dev account + a sender. Add only if arms 1-2 disappoint.
+Pipeline stages (`Sources/Pipeline/`):
 
-## Setup (10 min)
+1. **Ingest** — PhotoKit month query; screenshots dropped via `PHAssetMediaSubtype`
+2. **Vision scoring** — aesthetics + `isUtility`, face capture quality, landmarks,
+   feature prints (`VisionScorer.swift`), checkpointed per-photo into a persistent
+   score store (`IncrementalScorer.swift`, `Documents/scores-yyyy-MM.json`)
+3. **Face identity** — ArcFace embeddings via a Core ML port (`FaceEmbedder.swift`,
+   `Sources/Models/`); running-mean person clusters persist in
+   `Documents/people.json`, editable in the People tab (name / star = required /
+   exclude), applied to every generation
+4. **Burst dedup** — 90s window + feature-print cosine ≥ 0.92
+5. **Coverage shortlist** — week floors, no-face quota, starred-person guarantee +
+   45% cap, excluded-person and stranger drops
+6. **Scene collapse** — union-find scene clustering on the shortlist (cosine ≥ 0.82
+   within 6h), max 3 representatives per cluster (kills near-duplicate pages)
+7. **Contact sheets** — 4×4 labeled grids at 1x scale (`ContactSheetRenderer.swift`)
+8. **Judge** — server-side claude-sonnet-5 picks and orders the book; book size is
+   `max(4, min(poolScaled, 2×sessions, sceneClusters))`
+9. **Scene check** — deterministic post-judge duplicate detection; one corrective
+   retry at ≥2 residual pairs (1 pair tolerated: major events earn a second page)
 
-1. `open PikaSync.xcodeproj`, select your team under Signing & Capabilities
-2. Run on YOUR PHONE (not simulator — background behavior is meaningless there)
-3. In the app: Request full access → Sync now (confirms the pipeline + beacon work)
-4. Background the app. Create the Shortcuts automation (arm 3)
-5. Use the phone normally for 2-3 weeks. Do NOT open the app daily — that would
-   contaminate the experiment (iOS grants background time to apps you use)
+Books persist in `Documents/runs.json` (Books tab, swipe or trash-icon to delete).
 
-## Success criteria (per arm, over 14 days)
+## Background strategy (the hard-won part)
 
-- **Winning:** wakes on ≥10 of 14 days with new-photo counts captured
-- **Viable-with-nudge:** wakes cluster around charging/overnight but land ≥5 of 7 days
-- **Dead:** multi-day gaps with no wakes → autonomy requires the push→open→approve
-  model (ChatBooks-style), which v1 was going to use anyway
+- **bg_refresh** (~30s budget): proven to fire 1–3×/day for 6+ days on an unused
+  app. The book job is chunked to fit it — each wake scores ~15s of photos;
+  month-close needs only shortlist + sheets + one server call (`AutoBook.tick`).
+- **bg_processing** (minutes budget): empirically starved — zero grants in 6 days
+  on an unused app. Still registered with `requiresExternalPower = true` as a
+  bonus path.
+- **Shortcuts automation** (daily time trigger) as a guided-setup arm, plus a
+  4-day dead-man local notification that only fires if wakes stop.
+- Every wake beacons to `ntfy.sh/pikasync-poc-trav-8347` and appends to
+  `Documents/wake-log.json`.
 
-Record: wake frequency per trigger type, longest gap, latency from photo-taken to
-first wake that saw it (ntfy timestamps give you all of this).
+`PikaSyncBG` is a second, sync-only target (`SourcesBG/`) running a no-touch
+neglect experiment. **Do not modify or reinstall it.**
 
-## Android (deferred until iOS reads out)
+## Build & run
 
-WorkManager periodic job + READ_MEDIA_IMAGES is reliably wakeable — capability is a
-non-question; the risk is Play Store review policy (core-functionality justification).
-Build only if iOS proves out, or if the team wants parallel evidence for investors.
+```bash
+brew install xcodegen
+xcodegen generate            # re-run after adding/removing files
+open PikaSync.xcodeproj      # select your team, run the PikaSync scheme on a real phone
+```
 
-## Photobook pipeline (on-device)
+Create `Sources/Secrets.swift` from `Secrets.example.swift.txt` (gitignored; only
+needed if you re-enable any direct-API path — judging normally goes through the
+server, no key on device).
 
-The app now carries the full curation pipeline: month ingest -> Vision scoring
-(aesthetics/isUtility, faceCaptureQuality, feature prints; screenshots dropped
-via PHAssetMediaSubtype) -> ArcFace identity clustering (Core ML port of
-InsightFace w600k_mbf in Sources/Models/, alignment in FaceEmbedder.swift) ->
-burst dedup -> coverage shortlist (week floors, no-face quota, required-person
-guarantee + 45% cap, excluded-person drop) -> labeled contact sheets ->
-claude-sonnet-5 judge (key via gitignored Sources/Secrets.swift; see
-Secrets.example.swift.txt) -> swipeable book.
+Server deploy: `cd server && vercel --prod` with `ANTHROPIC_API_KEY` set as a
+Vercel env var.
 
-People clusters persist in Documents/people.json and are editable in the
-People screen (name, star = required, exclude). Applied to every generation.
+## Remote control & observability (no hands on the phone)
 
-License note: the bundled face model derives from InsightFace (non-commercial
-research license). POC only — production ships AuraFace or a licensed model.
+- Trigger a run: write `{"action":"run","month":"2026-05"}` (or `"score"` to fill
+  the score store only) to `Documents/command.json` via
+  `xcrun devicectl device copy to --domain-type appDataContainer
+  --domain-identifier com.travisse.pikasync ...`, then
+  `xcrun devicectl device process launch com.travisse.pikasync` (device must be
+  unlocked). The app consumes the command on becoming active.
+- Every run (manual/remote/bg) appends to `Documents/last-run.json` — status,
+  error, per-stage timings — pullable with `devicectl device copy from`.
+
+## License note
+
+The bundled face model derives from InsightFace weights (non-commercial research
+license). POC only — production ships AuraFace-v1 (commercial-friendly) or a
+licensed model.

@@ -6,7 +6,7 @@ struct SavedRun: Codable, Identifiable {
     struct Selection: Codable {
         let assetID: String
         let page: Int
-        let caption: String
+        var caption: String? = nil  // legacy runs only; new books have no captions
     }
     let id: UUID
     let createdAt: Date

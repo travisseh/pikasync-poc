@@ -15,7 +15,11 @@ enum ContactSheetRenderer {
         for chunkStart in stride(from: 0, to: scores.count, by: perSheet) {
             let chunk = Array(scores[chunkStart..<min(chunkStart + perSheet, scores.count)])
             let size = CGSize(width: cell * CGFloat(cols), height: (cell + labelH) * CGFloat(rows))
-            let renderer = UIGraphicsImageRenderer(size: size)
+            // 1x pixels: the default format uses the device's 3x screen scale, which
+            // makes each sheet ~9x the bytes and blows Vercel's 4.5MB request cap.
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = 1
+            let renderer = UIGraphicsImageRenderer(size: size, format: format)
             let img = renderer.image { ctx in
                 UIColor.white.setFill()
                 ctx.fill(CGRect(origin: .zero, size: size))

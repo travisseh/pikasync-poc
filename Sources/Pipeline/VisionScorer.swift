@@ -5,7 +5,7 @@ import UIKit
 
 /// Per-photo scores from Apple's on-device Vision APIs — the same signals the
 /// desktop pipeline's visiontool CLI produced on the Mac.
-struct PhotoScore: Identifiable {
+struct PhotoScore: Identifiable, Codable {
     let id: String            // PHAsset localIdentifier
     let date: Date?
     var aesthetics: Float = 0

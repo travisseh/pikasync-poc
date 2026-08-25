@@ -8,7 +8,7 @@ struct PikaSyncApp: App {
 
     init() {
         SyncEngine.register()
-        SyncEngine.autoBookHook = { await AutoBook.generateIfDue() }
+        SyncEngine.autoBookHook = { trigger in await AutoBook.tick(trigger: trigger) }
     }
 
     var body: some Scene {
@@ -18,6 +18,8 @@ struct PikaSyncApp: App {
         .onChange(of: scenePhase) { _, phase in
             if phase == .background {
                 SyncEngine.schedule()
+            } else if phase == .active {
+                RemoteCommand.checkAndRun()
             }
         }
     }
@@ -121,6 +123,8 @@ struct BooksTab: View {
 struct SavedBookView: View {
     let run: SavedRun
     @State private var images: [String: UIImage] = [:]
+    @State private var confirmDelete = false
+    @Environment(\.dismiss) private var dismiss
 
     private var pages: [SavedRun.Selection] { run.selections.sorted { $0.page < $1.page } }
 
@@ -141,7 +145,6 @@ struct SavedBookView: View {
                     } else {
                         ProgressView()
                     }
-                    Text(sel.caption).font(.headline)
                     Text("page \(sel.page)").font(.caption).foregroundStyle(.secondary)
                 }
                 .padding().tag(sel.page)
@@ -150,6 +153,19 @@ struct SavedBookView: View {
         .tabViewStyle(.page)
         .navigationTitle(run.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(role: .destructive) { confirmDelete = true } label: {
+                    Image(systemName: "trash")
+                }
+            }
+        }
+        .confirmationDialog("Delete this book?", isPresented: $confirmDelete, titleVisibility: .visible) {
+            Button("Delete \(run.title)", role: .destructive) {
+                RunStore.shared.delete(run.id)
+                dismiss()
+            }
+        }
         .task {
             let ids = pages.map(\.assetID) + [run.coverAssetID]
             images = await AssetLoader.load(ids: Array(Set(ids)), size: CGSize(width: 1600, height: 1600))

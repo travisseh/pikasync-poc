@@ -4,7 +4,6 @@ import UIKit
 struct BookSelection: Codable, Identifiable {
     let index: Int
     let page: Int
-    let caption: String
     var id: Int { index }
 }
 
@@ -14,87 +13,83 @@ struct BookResult: Codable {
     let selections: [BookSelection]
 }
 
-/// Calls the Anthropic Messages API directly with the contact sheets as images.
-/// POC-only architecture — production would upload sheets to a server that
-/// holds the key and runs the judge there.
+/// Thin client for the server-side judge (Vercel). The phone uploads only the
+/// contact sheets; the Anthropic key and prompt live on the server, and the
+/// judge output carries no captions — pages are photo + order only.
 enum JudgeClient {
+    static let serverURL = URL(string: "https://pikasync-judge.vercel.app/api/judge")!
+
     struct JudgeOutput {
         let book: BookResult
         let usageSummary: String
     }
 
-    static func judge(sheets: [UIImage], monthLabel: String, count: Int, maxIndex: Int, correction: String? = nil) async throws -> JudgeOutput {
-        let prompt = """
-        You are choosing photos for a printed monthly family photobook the parents will keep forever.
-
-        The attached contact sheet images cover \(monthLabel). Each photo is labeled [index] with its date and face count. Valid indexes are 0 through \(maxIndex).
-
-        Choose EXACTLY \(count) photos and design the book:
-        - Chronological narrative arc across the month
-        - Balance the people; labeled names are the family this book is about — strongly prefer photos of them
-        - Include 2-4 non-people shots ONLY if they clearly add story (a place, trip, event, or milestone); skip mundane food, objects, and receipts unless visually exceptional
-        - Prefer emotional resonance and storytelling over technical perfection
-        - Never pick two photos of the same scene/moment, and at most 2 photos from the same location or session across the whole book — even with different people in them
-        - Captions must state only what is visibly in the photo; never invent names, events, relationships, or activities you cannot see
-
-        Respond with ONLY a JSON object, no other text:
-        {"title": "short book title", "cover_index": <index>, "selections": [{"index": <int>, "page": <1-\(count) in book order>, "caption": "<=8 words, factual"}]}
-        The selections array must contain exactly \(count) entries with distinct indexes.
-        \(correction.map { "\nIMPORTANT CORRECTION — your previous answer had these problems, fix them while keeping everything else:\n\($0)" } ?? "")
-        """
-
-        var content: [[String: Any]] = []
-        for sheet in sheets {
-            guard let jpeg = sheet.jpegData(compressionQuality: 0.7) else { continue }
-            content.append([
-                "type": "image",
-                "source": ["type": "base64", "media_type": "image/jpeg", "data": jpeg.base64EncodedString()],
-            ])
+    private struct ServerResponse: Codable {
+        struct Usage: Codable {
+            let input_tokens: Int?
+            let output_tokens: Int?
         }
-        content.append(["type": "text", "text": prompt])
+        let book: BookResult
+        let usage: Usage?
+    }
 
-        let body: [String: Any] = [
-            "model": "claude-sonnet-5",
-            "max_tokens": 4000,
-            "messages": [["role": "user", "content": content]],
+    /// Vercel rejects request bodies over 4.5MB; step quality down until the
+    /// base64 payload fits with headroom.
+    private static func encodeSheets(_ sheets: [UIImage]) -> [String] {
+        for quality in [0.7, 0.5, 0.35] {
+            let encoded = sheets.compactMap { $0.jpegData(compressionQuality: quality)?.base64EncodedString() }
+            let total = encoded.reduce(0) { $0 + $1.utf8.count }
+            if total < 3_800_000 { return encoded }
+        }
+        return sheets.compactMap { $0.jpegData(compressionQuality: 0.25)?.base64EncodedString() }
+    }
+
+    static func judge(sheets: [UIImage], monthLabel: String, count: Int, maxIndex: Int, correction: String? = nil) async throws -> JudgeOutput {
+        var body: [String: Any] = [
+            "monthLabel": monthLabel,
+            "count": count,
+            "maxIndex": maxIndex,
+            "sheets": encodeSheets(sheets),
         ]
+        if let correction { body["correction"] = correction }
 
-        var req = URLRequest(url: URL(string: "https://api.anthropic.com/v1/messages")!)
+        var req = URLRequest(url: serverURL)
         req.httpMethod = "POST"
-        req.setValue(Secrets.anthropicKey, forHTTPHeaderField: "x-api-key")
-        req.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
         req.setValue("application/json", forHTTPHeaderField: "content-type")
         req.timeoutInterval = 300
         req.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        let (data, resp) = try await URLSession.shared.data(for: req)
+        // iPhones intermittently drop large uploads with -1005 "connection lost"
+        // (stale connection reuse); a fresh session + retry almost always succeeds.
+        var lastError: Error = PipelineError.message("judge request never attempted")
+        var result: (Data, URLResponse)? = nil
+        for attempt in 1...3 {
+            do {
+                let session = URLSession(configuration: .ephemeral)
+                result = try await session.data(for: req)
+                break
+            } catch let e as URLError where [.networkConnectionLost, .timedOut, .cannotConnectToHost, .notConnectedToInternet].contains(e.code) {
+                lastError = e
+                if attempt < 3 { try? await Task.sleep(for: .seconds(2)) }
+            }
+        }
+        guard let (data, resp) = result else { throw lastError }
         guard let http = resp as? HTTPURLResponse, http.statusCode == 200 else {
             let text = String(data: data, encoding: .utf8) ?? ""
-            throw PipelineError.message("API \( (resp as? HTTPURLResponse)?.statusCode ?? -1): \(text.prefix(300))")
+            throw PipelineError.message("judge server \((resp as? HTTPURLResponse)?.statusCode ?? -1): \(text.prefix(300))")
         }
 
-        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
-        let usage = json["usage"] as? [String: Any] ?? [:]
-        let inTok = usage["input_tokens"] as? Int ?? 0
-        let outTok = usage["output_tokens"] as? Int ?? 0
-        let cost = Double(inTok) * 3.0 / 1e6 + Double(outTok) * 15.0 / 1e6
-        let usageSummary = String(format: "%d in / %d out tokens ≈ $%.3f (sonnet)", inTok, outTok, cost)
+        let parsed = try JSONDecoder().decode(ServerResponse.self, from: data)
 
-        guard let blocks = json["content"] as? [[String: Any]],
-              let text = blocks.compactMap({ $0["text"] as? String }).first else {
-            throw PipelineError.message("no text in response")
-        }
-        guard let start = text.firstIndex(of: "{"), let end = text.lastIndex(of: "}") else {
-            throw PipelineError.message("no JSON in judge output: \(text.prefix(200))")
-        }
-        let jsonStr = String(text[start...end])
-        let book = try JSONDecoder().decode(BookResult.self, from: Data(jsonStr.utf8))
-
-        // validation, mirroring judge.py
-        let idxs = book.selections.map(\.index)
+        // Server validates too; re-check here so a bad deploy can't corrupt runs.
+        let idxs = parsed.book.selections.map(\.index)
         if Set(idxs).count != idxs.count { throw PipelineError.message("judge returned duplicate indexes") }
         if idxs.contains(where: { $0 < 0 || $0 > maxIndex }) { throw PipelineError.message("judge returned out-of-range index") }
 
-        return JudgeOutput(book: book, usageSummary: usageSummary)
+        let inTok = parsed.usage?.input_tokens ?? 0
+        let outTok = parsed.usage?.output_tokens ?? 0
+        let cost = Double(inTok) * 3.0 / 1e6 + Double(outTok) * 15.0 / 1e6
+        let usageSummary = String(format: "%d in / %d out tokens ≈ $%.3f (sonnet, server)", inTok, outTok, cost)
+        return JudgeOutput(book: parsed.book, usageSummary: usageSummary)
     }
 }

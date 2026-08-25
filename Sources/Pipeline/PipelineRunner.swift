@@ -33,80 +33,47 @@ final class PipelineRunner: ObservableObject {
     static let sceneSim: Float = 0.82
     static let sceneWindowHours: TimeInterval = 6
 
+    /// Who kicked off this run — "manual", "remote", or "bg" — recorded in last-run.json.
+    var trigger = "manual"
+
     func run(month: Date) async {
         running = true
         errorText = nil
         book = nil
         sheets = []
         stageTimes = []
-        defer { running = false }
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM"
+        let monthKey = df.string(from: month)
+        defer {
+            running = false
+            RunStatusLog.write(month: monthKey, status: status, error: errorText,
+                               stages: stageTimes.map { "\($0.name): \($0.detail) (\(String(format: "%.1f", $0.seconds))s)" },
+                               trigger: trigger)
+        }
 
         do {
-            // Stage 1: ingest — fetch assets for the month
+            // Stage 1+2: ensure the month is fully scored in the incremental
+            // store (background wakes may already have paid most of this).
             var t0 = Date()
+            status = "scoring…"
+            let chunk = await IncrementalScorer.scoreChunk(month: month, budget: nil) { done, total in
+                self.status = "scoring \(done)/\(total)"
+                self.progress = Double(done) / Double(max(1, total))
+            }
+            guard chunk.total >= 0 else { throw PipelineError.message("no photo permission") }
+            guard chunk.total >= 8 else {
+                throw PipelineError.message("Only \(chunk.total) photos in that month — pick a busier one")
+            }
+            let scores = IncrementalScorer.loadScores(month: month)
+            record("scoring", since: t0, "\(chunk.total) in month, \(chunk.newlyScored) newly scored, \(chunk.total - chunk.newlyScored) from store")
+
             let cal = Calendar.current
             let start = cal.date(from: cal.dateComponents([.year, .month], from: month))!
-            let end = cal.date(byAdding: .month, value: 1, to: start)!
-            let opts = PHFetchOptions()
-            opts.predicate = NSPredicate(format: "creationDate >= %@ AND creationDate < %@", start as NSDate, end as NSDate)
-            opts.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
-            let fetch = PHAsset.fetchAssets(with: .image, options: opts)
-            var assets: [PHAsset] = []
-            var screenshotsDropped = 0
-            fetch.enumerateObjects { a, _, _ in
-                if a.mediaSubtypes.contains(.photoScreenshot) { screenshotsDropped += 1 } else { assets.append(a) }
-            }
-            record("ingest", since: t0, "\(assets.count) photos in month (\(screenshotsDropped) screenshots dropped)")
-            guard assets.count >= 8 else {
-                throw PipelineError.message("Only \(assets.count) photos in that month — pick a busier one")
-            }
-
-            // Stage 2: Vision scoring
-            t0 = Date()
-            status = "scoring 0/\(assets.count)"
-            var scores: [PhotoScore] = []
-            let mgr = PHImageManager.default()
-            let reqOpts = PHImageRequestOptions()
-            reqOpts.isSynchronous = true
-            reqOpts.deliveryMode = .highQualityFormat
-            reqOpts.isNetworkAccessAllowed = true  // pull from iCloud if needed
-            reqOpts.resizeMode = .fast
-            let target = CGSize(width: 1024, height: 1024)
-            let people = PeopleStore.shared
-            for (i, asset) in assets.enumerated() {
-                let score: PhotoScore? = await withCheckedContinuation { cont in
-                    DispatchQueue.global(qos: .userInitiated).async {
-                        autoreleasepool {
-                            var out: PhotoScore? = nil
-                            mgr.requestImage(for: asset, targetSize: target, contentMode: .aspectFit, options: reqOpts) { img, _ in
-                                if let cg = img?.cgImage {
-                                    var (s, faceObs) = VisionScorer.score(assetID: asset.localIdentifier, date: asset.creationDate, cgImage: cg)
-                                    if FaceIDBridge.isAvailable {
-                                        for face in faceObs.prefix(6) {
-                                            if let (emb, crop) = FaceIDBridge.embed(fullImage: cg, face: face) {
-                                                let id = DispatchQueue.main.sync { people.assign(embedding: emb, crop: crop) }
-                                                s.personIDs.insert(id)
-                                            }
-                                        }
-                                    }
-                                    out = s
-                                }
-                            }
-                            cont.resume(returning: out)
-                        }
-                    }
-                }
-                if let s = score { scores.append(s) }
-                if i % 10 == 0 {
-                    status = "scoring \(i + 1)/\(assets.count)"
-                    progress = Double(i + 1) / Double(assets.count)
-                }
-            }
-            record("vision scoring", since: t0, String(format: "%d scored, %.2fs/photo", scores.count, Date().timeIntervalSince(t0) / Double(max(1, scores.count))))
 
             // Stage 3: quality gate + burst dedup (+ excluded-people drop)
             t0 = Date()
-            people.save()
+            let people = PeopleStore.shared
             let excluded = people.excludedIDs
             let kept = scores.filter { !$0.isUtility && $0.personIDs.isDisjoint(with: excluded) }
             let excludedDrops = scores.filter { !$0.personIDs.isDisjoint(with: excluded) }.count
@@ -130,11 +97,24 @@ final class PipelineRunner: ObservableObject {
             for i in ranked.indices { ranked[i].finalScore = composite(ranked[i]) }
             ranked.sort { $0.finalScore > $1.finalScore }
             var chosen = shortlistSelect(ranked: ranked)
+            // Pre-judge scene collapse (proven in eval round 3): the backfill
+            // tiers can let one scene flood the shortlist, and the post-judge
+            // repair can then only swap within that flood. Cap representatives
+            // per scene cluster BEFORE the judge ever sees them.
+            let clusters = sceneClusters(chosen)
+            let preCollapse = chosen.count
+            var keep = Set<Int>()
+            for members in clusters {
+                for i in members.sorted(by: { chosen[$0].finalScore > chosen[$1].finalScore }).prefix(3) {
+                    keep.insert(i)
+                }
+            }
+            chosen = keep.sorted().map { chosen[$0] }
             chosen.sort { ($0.date ?? .distantPast) < ($1.date ?? .distantPast) }
             for i in chosen.indices { chosen[i].shortlistIndex = i }
             shortlist = chosen
             let noFace = chosen.filter { $0.nFaces == 0 }.count
-            record("shortlist", since: t0, "\(chosen.count) chosen, \(noFace) no-face")
+            record("shortlist", since: t0, "\(chosen.count) chosen (\(preCollapse - chosen.count) scene-collapsed, \(clusters.count) scenes), \(noFace) no-face")
 
             // Stage 5: contact sheets
             t0 = Date()
@@ -148,19 +128,27 @@ final class PipelineRunner: ObservableObject {
             status = "judging (claude-sonnet-5)"
             let monthName = DateFormatter.localizedString(from: start, dateStyle: .medium, timeStyle: .none)
             // Never ask for a book the pool can't support: judge needs real
-            // choice (~2.5x) or it's forced into near-twins (proven in eval).
-            let bookCount = min(Self.bookSize, max(8, chosen.count * 5 / 12))
+            // choice (~2.5x), thin-variety months must shrink instead of
+            // duplicating, and a book can't have more pages than distinct
+            // scenes (all three caps proven necessary in eval).
+            let poolScaled = min(Self.bookSize, max(8, chosen.count * 5 / 12))
+            let sessions = sessionCount(chosen)
+            let bookCount = max(4, min(poolScaled, max(6, 2 * sessions), clusters.count))
             var result = try await JudgeClient.judge(sheets: sheets, monthLabel: monthName, count: bookCount, maxIndex: chosen.count - 1)
 
             // Deterministic same-scene check on the judge's picks: prompt rules
-            // bend under pool pressure, feature-print math doesn't. One retry.
+            // bend under pool pressure, feature-print math doesn't. One residual
+            // pair is tolerated (a major event legitimately carries two pages);
+            // retry only at >=2.
             let violations = sceneViolations(result.book, chosen: chosen)
-            if !violations.isEmpty {
+            if violations.count >= 2 {
                 let detail = violations.map { "picks \($0.0) and \($0.1) are the same scene — replace one of each pair" }.joined(separator: "; ")
                 status = "judge re-pick (\(violations.count) same-scene pairs)"
                 result = try await JudgeClient.judge(sheets: sheets, monthLabel: monthName, count: bookCount, maxIndex: chosen.count - 1, correction: detail)
                 let remaining = sceneViolations(result.book, chosen: chosen)
-                record("scene re-pick", since: t0, remaining.isEmpty ? "clean after retry" : "\(remaining.count) pairs still similar (accepted)")
+                record("scene re-pick", since: t0, remaining.count <= 1 ? "clean after retry (\(remaining.count) residual)" : "\(remaining.count) pairs still similar (accepted)")
+            } else if violations.count == 1 {
+                record("scene check", since: t0, "1 residual pair (tolerated — likely major event)")
             }
             record("LLM judge", since: t0, result.usageSummary)
             judgeInfo = result.usageSummary
@@ -170,7 +158,7 @@ final class PipelineRunner: ObservableObject {
             // persist the run so past books stay viewable
             let byIndex = Dictionary(uniqueKeysWithValues: chosen.compactMap { s in s.shortlistIndex.map { ($0, s.id) } })
             let sels = result.book.selections.compactMap { sel in
-                byIndex[sel.index].map { SavedRun.Selection(assetID: $0, page: sel.page, caption: sel.caption) }
+                byIndex[sel.index].map { SavedRun.Selection(assetID: $0, page: sel.page) }
             }
             if let coverID = byIndex[result.book.cover_index] {
                 let thumb = await loadThumbs(ids: [coverID], size: CGSize(width: 600, height: 600))[coverID]
@@ -185,6 +173,65 @@ final class PipelineRunner: ObservableObject {
             errorText = "\(error)"
             status = "failed"
         }
+    }
+
+    /// Union-find scene clusters over the shortlist: same cluster when
+    /// feature-print cosine >= sceneSim within the scene time window.
+    private func sceneClusters(_ photos: [PhotoScore]) -> [[Int]] {
+        var parent = Array(0..<photos.count)
+        func find(_ i: Int) -> Int {
+            var i = i
+            while parent[i] != i { parent[i] = parent[parent[i]]; i = parent[i] }
+            return i
+        }
+        for i in 0..<photos.count {
+            guard let fi = photos[i].featurePrint, let di = photos[i].date else { continue }
+            for j in (i + 1)..<photos.count {
+                guard let fj = photos[j].featurePrint, let dj = photos[j].date,
+                      abs(di.timeIntervalSince(dj)) <= Self.sceneWindowHours * 3600,
+                      VisionScorer.cosine(fi, fj) >= Self.sceneSim else { continue }
+                parent[find(j)] = find(i)
+            }
+        }
+        var clusters: [Int: [Int]] = [:]
+        for i in 0..<photos.count { clusters[find(i), default: []].append(i) }
+        return Array(clusters.values)
+    }
+
+    /// Distinct sessions: 3h time-gap clusters, merged when any cross-session
+    /// pair is scene-similar (a trip revisited across the day is one session).
+    private func sessionCount(_ photos: [PhotoScore]) -> Int {
+        let dated = photos.filter { $0.date != nil }.sorted { $0.date! < $1.date! }
+        guard !dated.isEmpty else { return 0 }
+        var sessions: [[PhotoScore]] = []
+        var lastDate: Date? = nil
+        for p in dated {
+            if let last = lastDate, p.date!.timeIntervalSince(last) <= 3 * 3600 {
+                sessions[sessions.count - 1].append(p)
+            } else {
+                sessions.append([p])
+            }
+            lastDate = p.date
+        }
+        var parent = Array(0..<sessions.count)
+        func find(_ i: Int) -> Int {
+            var i = i
+            while parent[i] != i { parent[i] = parent[parent[i]]; i = parent[i] }
+            return i
+        }
+        for i in 0..<sessions.count {
+            for j in (i + 1)..<sessions.count where find(i) != find(j) {
+                let hit = sessions[i].contains { a in
+                    guard let fa = a.featurePrint else { return false }
+                    return sessions[j].contains { b in
+                        guard let fb = b.featurePrint else { return false }
+                        return VisionScorer.cosine(fa, fb) >= Self.sceneSim
+                    }
+                }
+                if hit { parent[find(j)] = find(i) }
+            }
+        }
+        return Set((0..<sessions.count).map(find)).count
     }
 
     /// Pairs of picked shortlist indexes that are the same scene by feature-print

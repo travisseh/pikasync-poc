@@ -57,8 +57,10 @@ enum SyncEngine {
     }
 
     /// Set by the main app only (nil in the BG test app): given the trigger,
-    /// runs the monthly auto-book generation and returns when done.
-    static var autoBookHook: (@MainActor () async -> Void)? = nil
+    /// runs one bounded slice of the auto-book work (chunked scoring, or the
+    /// month-close remainder). Fits the ~30s bg_refresh budget; scores
+    /// checkpoint continuously so expiration loses at most one photo.
+    static var autoBookHook: (@MainActor (String) async -> Void)? = nil
 
     private static func handle(task: BGTask, trigger: String) {
         schedule()  // always re-schedule the next one first
@@ -66,11 +68,9 @@ enum SyncEngine {
             WakeLog.record(trigger: trigger, newPhotos: -1, totalPhotos: -1, note: "expired")
         }
         runSync(trigger: trigger)
-        // The processing task's budget (minutes) is what makes full book
-        // generation viable in the background — the core product question.
-        if trigger == "bg_processing", let hook = autoBookHook {
+        if let hook = autoBookHook {
             Task { @MainActor in
-                await hook()
+                await hook(trigger)
                 task.setTaskCompleted(success: true)
             }
         } else {
@@ -83,10 +83,12 @@ enum SyncEngine {
         refresh.earliestBeginDate = Date(timeIntervalSinceNow: 4 * 60 * 60)  // ask for every 4h
         try? BGTaskScheduler.shared.submit(refresh)
 
+        // Parallel experiment: does requiring external power get processing
+        // wakes granted overnight on the charger? (Without it: 0 grants in 6 days.)
         let process = BGProcessingTaskRequest(identifier: processTaskID)
         process.earliestBeginDate = Date(timeIntervalSinceNow: 12 * 60 * 60)
         process.requiresNetworkConnectivity = true
-        process.requiresExternalPower = false
+        process.requiresExternalPower = true
         try? BGTaskScheduler.shared.submit(process)
     }
 

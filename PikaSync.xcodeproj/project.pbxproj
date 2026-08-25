@@ -22,6 +22,7 @@
 		A6A9B1223B827877780F5AC4 /* PeopleScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFE323F5B3C8AB3FE1A89DD /* PeopleScanner.swift */; };
 		A75359DA463DFA82116988D4 /* PeoplePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */; };
 		A7DB15953428C6938B99E4A0 /* Secrets.example.swift.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0642578F74527EE393AC9C5F /* Secrets.example.swift.txt */; };
+		BB17ABC85415E935FF287ADD /* RunStatusLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249C93078D8EE26D11ED359F /* RunStatusLog.swift */; };
 		CBED4365709F1372332B7359 /* JudgeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */; };
 		D15C8F72DCEEF518BE85A0E7 /* SyncIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */; };
 		D7274D2524D4EEF6EC912EB0 /* PipelineRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */; };
@@ -29,8 +30,10 @@
 		E0AF3797B6E6AC8173ACABD6 /* AutoBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB66E6C656A87E221C65E6D1 /* AutoBook.swift */; };
 		E348A9CB8A2BE185DECBADC2 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06985FAD552338141D65F423 /* Secrets.swift */; };
 		E605B4F905E539DDDFB8A77D /* PeopleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED070F39260B1772B9FB974C /* PeopleStore.swift */; };
+		E98F6800FFC11A0C92BC6AC3 /* IncrementalScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BA830477CF75E6FDC4F375 /* IncrementalScorer.swift */; };
 		F968DBE3C22AE4C792D02DC0 /* AssetLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74AAFE69AD28336C82801908 /* AssetLoader.swift */; };
 		FD8BED19C2C1CB1428B1B09A /* RunStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3067CD55884C0BBEE7EF181D /* RunStore.swift */; };
+		FE7118E4A74994AB5862A13B /* RemoteCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF9BB1706941D3074E5B2EC /* RemoteCommand.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,16 +41,19 @@
 		0642578F74527EE393AC9C5F /* Secrets.example.swift.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Secrets.example.swift.txt; sourceTree = "<group>"; };
 		06985FAD552338141D65F423 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		22F6068E0F6E73F6E889D3FB /* BGApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGApp.swift; sourceTree = "<group>"; };
+		249C93078D8EE26D11ED359F /* RunStatusLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunStatusLog.swift; sourceTree = "<group>"; };
 		3067CD55884C0BBEE7EF181D /* RunStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunStore.swift; sourceTree = "<group>"; };
 		3381FEE037C5170449DEAD88 /* VisionScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionScorer.swift; sourceTree = "<group>"; };
 		507E9248D4787B1306685615 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6EAEDF624447F6C43243796F /* WakeLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WakeLog.swift; sourceTree = "<group>"; };
+		73BA830477CF75E6FDC4F375 /* IncrementalScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncrementalScorer.swift; sourceTree = "<group>"; };
 		74AAFE69AD28336C82801908 /* AssetLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetLoader.swift; sourceTree = "<group>"; };
 		772082287A77A4A9769987DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8C0A3AF8C41D8EF6B382BBBB /* PikaSyncBG.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikaSyncBG.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		914E68CA1E5E3FC3847853AB /* PipelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineView.swift; sourceTree = "<group>"; };
 		9EFE323F5B3C8AB3FE1A89DD /* PeopleScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleScanner.swift; sourceTree = "<group>"; };
 		A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineRunner.swift; sourceTree = "<group>"; };
+		ADF9BB1706941D3074E5B2EC /* RemoteCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCommand.swift; sourceTree = "<group>"; };
 		AF771AC045A10D44432855EB /* PikaSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikaSyncApp.swift; sourceTree = "<group>"; };
 		B093237EA24679EBDAB4454F /* FaceEmbedder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceEmbedder.swift; sourceTree = "<group>"; };
 		B61B3D54A90144B7B9F42955 /* FaceEmbedding.mlpackage */ = {isa = PBXFileReference; path = FaceEmbedding.mlpackage; sourceTree = "<group>"; };
@@ -70,12 +76,15 @@
 				D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */,
 				B093237EA24679EBDAB4454F /* FaceEmbedder.swift */,
 				E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */,
+				73BA830477CF75E6FDC4F375 /* IncrementalScorer.swift */,
 				FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */,
 				DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */,
 				9EFE323F5B3C8AB3FE1A89DD /* PeopleScanner.swift */,
 				ED070F39260B1772B9FB974C /* PeopleStore.swift */,
 				A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */,
 				914E68CA1E5E3FC3847853AB /* PipelineView.swift */,
+				ADF9BB1706941D3074E5B2EC /* RemoteCommand.swift */,
+				249C93078D8EE26D11ED359F /* RunStatusLog.swift */,
 				3067CD55884C0BBEE7EF181D /* RunStore.swift */,
 				3381FEE037C5170449DEAD88 /* VisionScorer.swift */,
 			);
@@ -232,6 +241,7 @@
 				0FD46C4808A9F5BE23C6F5B3 /* FaceEmbedder.swift in Sources */,
 				4DB1AAA2854A219EDA0B9FAE /* FaceEmbedding.mlpackage in Sources */,
 				464238A4ECA779125DF2CC71 /* FaceIDBridge.swift in Sources */,
+				E98F6800FFC11A0C92BC6AC3 /* IncrementalScorer.swift in Sources */,
 				CBED4365709F1372332B7359 /* JudgeClient.swift in Sources */,
 				A75359DA463DFA82116988D4 /* PeoplePickerView.swift in Sources */,
 				A6A9B1223B827877780F5AC4 /* PeopleScanner.swift in Sources */,
@@ -239,6 +249,8 @@
 				62CEA496266926F5C1A1E4F7 /* PikaSyncApp.swift in Sources */,
 				D7274D2524D4EEF6EC912EB0 /* PipelineRunner.swift in Sources */,
 				2E9F6FBE19781CEAE9793174 /* PipelineView.swift in Sources */,
+				FE7118E4A74994AB5862A13B /* RemoteCommand.swift in Sources */,
+				BB17ABC85415E935FF287ADD /* RunStatusLog.swift in Sources */,
 				FD8BED19C2C1CB1428B1B09A /* RunStore.swift in Sources */,
 				E348A9CB8A2BE185DECBADC2 /* Secrets.swift in Sources */,
 				6D5CC45ABBE70DC547B06E4D /* SyncEngine.swift in Sources */,

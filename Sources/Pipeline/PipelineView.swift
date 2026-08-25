@@ -115,7 +115,6 @@ struct BookView: View {
                         } else {
                             ProgressView()
                         }
-                        Text(sel.caption).font(.headline)
                         Text("page \(sel.page)").font(.caption).foregroundStyle(.secondary)
                     }
                     .padding()
