@@ -304,6 +304,11 @@ struct SavedBookView: View {
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
+                Button { Task { await openFeedback() } } label: {
+                    Image(systemName: "bubble.left")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 Button { showActions = true } label: {
                     Image(systemName: "ellipsis")
                 }
@@ -425,13 +430,6 @@ struct SavedBookView: View {
                 }
                 .buttonStyle(PillButtonStyle())
 
-                Button {
-                    showActions = false
-                    Task { await openFeedback() }
-                } label: {
-                    Label("Feedback on this book", systemImage: "bubble.left")
-                }
-                .buttonStyle(PillButtonStyle(filled: false))
 
                 Button {
                     showActions = false
