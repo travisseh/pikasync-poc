@@ -14,8 +14,16 @@ struct PikaSyncApp: App {
         let tabAppearance = UITabBarAppearance()
         tabAppearance.configureWithOpaqueBackground()
         tabAppearance.backgroundColor = .white
+        // Push icons/labels down from the bar's top edge for breathing room.
+        for item in [tabAppearance.stackedLayoutAppearance,
+                     tabAppearance.inlineLayoutAppearance,
+                     tabAppearance.compactInlineLayoutAppearance] {
+            item.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 6)
+            item.selected.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 6)
+        }
         UITabBar.appearance().standardAppearance = tabAppearance
         UITabBar.appearance().scrollEdgeAppearance = tabAppearance
+        UITabBarItem.appearance().imageInsets = UIEdgeInsets(top: 6, left: 0, bottom: -6, right: 0)
     }
 
     var body: some Scene {
