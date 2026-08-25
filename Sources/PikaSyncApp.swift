@@ -14,6 +14,7 @@ struct PikaSyncApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .tint(Pika.accent)
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background {
@@ -27,19 +28,35 @@ struct PikaSyncApp: App {
 
 struct RootView: View {
     @StateObject private var scanner = PeopleScanner()
+    @State private var tab = 0
 
     var body: some View {
-        TabView {
+        TabView(selection: $tab) {
             BooksTab(scanner: scanner)
-                .tabItem { Label("Books", systemImage: "book.pages") }
+                .tabItem { Label("Books", systemImage: "book.pages") }.tag(0)
             NavigationStack { PeoplePickerView(scanner: scanner) }
-                .tabItem { Label("People", systemImage: "person.2") }
+                .tabItem { Label("People", systemImage: "person.2") }.tag(1)
             NavigationStack { SyncView() }
-                .tabItem { Label("Sync", systemImage: "arrow.triangle.2.circlepath") }
+                .tabItem { Label("Sync", systemImage: "arrow.triangle.2.circlepath") }.tag(2)
         }
+        #if DEBUG
         .onAppear {
+            switch ProcessInfo.processInfo.environment["PIKA_SCREEN"] {
+            case "people": tab = 1
+            case "sync": tab = 2
+            default: break
+            }
+        }
+        #endif
+        .onAppear {
+            #if DEBUG
+            if ProcessInfo.processInfo.environment["PIKA_MOCK"] == "1" { return }
+            #endif
             UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
         }
+        #if DEBUG
+        .task { await MockSeeder.seedIfRequested() }
+        #endif
     }
 }
 
@@ -49,72 +66,152 @@ struct BooksTab: View {
     @ObservedObject var scanner: PeopleScanner
     @ObservedObject private var runStore = RunStore.shared
     @ObservedObject private var people = PeopleStore.shared
+    #if DEBUG
+    @State private var autoOpenBook = false
+    @State private var autoOpenPipeline = false
+    #endif
 
     var body: some View {
         NavigationStack {
-            List {
-                if people.clusters.isEmpty && !scanner.hasScanned {
-                    Section {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Set up: find your people").font(.headline)
-                            Text("Pikabook scans your last 6 months of photos to learn who your books are about. You then name and star your family.")
-                                .font(.caption).foregroundStyle(.secondary)
-                            if scanner.scanning {
-                                ProgressView(value: scanner.progress)
-                                Text(scanner.statusText).font(.caption).foregroundStyle(.secondary)
-                            } else {
-                                Button("Scan my photos") {
-                                    Task { await scanner.scan() }
-                                }
-                                .buttonStyle(.borderedProminent)
-                            }
-                        }
-                        .padding(.vertical, 4)
+            ScrollView {
+                VStack(spacing: 20) {
+                    if people.clusters.isEmpty && !scanner.hasScanned {
+                        welcomeCard
                     }
-                }
 
-                Section {
-                    NavigationLink {
-                        PipelineView()
-                    } label: {
-                        Label("Create a book", systemImage: "plus.circle.fill")
-                            .font(.headline)
-                    }
-                }
-
-                Section(runStore.runs.isEmpty ? "" : "Your books") {
                     if runStore.runs.isEmpty {
-                        Text("No books yet — create your first one above.")
-                            .foregroundStyle(.secondary)
+                        emptyState
                     }
+
                     ForEach(runStore.runs) { run in
                         NavigationLink {
                             SavedBookView(run: run)
                         } label: {
-                            HStack(spacing: 12) {
-                                if let data = run.coverThumbJPEG, let img = UIImage(data: data) {
-                                    Image(uiImage: img)
-                                        .resizable().scaledToFill()
-                                        .frame(width: 64, height: 64)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                            BookCard(run: run)
+                        }
+                        .buttonStyle(PressCardStyle())
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                                    runStore.delete(run.id)
                                 }
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(run.title).font(.headline)
-                                    Text("\(run.monthLabel) · \(run.selections.count) photos")
-                                        .font(.caption).foregroundStyle(.secondary)
-                                    Text(run.createdAt, format: .dateTime.month().day().hour().minute())
-                                        .font(.caption2).foregroundStyle(.tertiary)
-                                }
+                            } label: {
+                                Label("Delete book", systemImage: "trash")
                             }
                         }
                     }
-                    .onDelete { idx in
-                        idx.map { runStore.runs[$0].id }.forEach { runStore.delete($0) }
-                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 96)
+            }
+            .background(Pika.bg)
+            .navigationTitle("Your books")
+            .safeAreaInset(edge: .bottom) {
+                NavigationLink {
+                    PipelineView()
+                } label: {
+                    Label("Create a book", systemImage: "plus")
+                }
+                .buttonStyle(PillButtonStyle())
+                .pikaShadow()
+                .padding(.horizontal, 20)
+                .padding(.top, 4)
+            }
+            #if DEBUG
+            .navigationDestination(isPresented: $autoOpenBook) {
+                if let run = runStore.runs.first { SavedBookView(run: run) }
+            }
+            .task {
+                let screen = ProcessInfo.processInfo.environment["PIKA_SCREEN"]
+                guard ["book", "actions", "feedback", "delete", "pipeline"].contains(screen ?? "") else { return }
+                for _ in 0..<50 where runStore.runs.isEmpty {
+                    try? await Task.sleep(for: .milliseconds(200))
+                }
+                if screen == "pipeline" { autoOpenPipeline = true }
+                else if !runStore.runs.isEmpty { autoOpenBook = true }
+            }
+            .navigationDestination(isPresented: $autoOpenPipeline) { PipelineView() }
+            #endif
+        }
+    }
+
+    private var welcomeCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Find your people")
+                .font(.system(size: 22, weight: .bold))
+                .foregroundStyle(Pika.ink)
+            Text("Pikabook scans your last 6 months of photos to learn who your books are about. You name and star your family once — every book uses it.")
+                .font(.system(size: 15))
+                .foregroundStyle(Pika.inkSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+            if scanner.scanning {
+                ProgressView(value: scanner.progress)
+                    .tint(Pika.accent)
+                Text(scanner.statusText)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Pika.inkSecondary)
+            } else {
+                Button("Scan my photos") {
+                    Task { await scanner.scan() }
+                }
+                .buttonStyle(PillButtonStyle())
+            }
+        }
+        .padding(20)
+        .background(RoundedRectangle(cornerRadius: Pika.cardRadius).fill(Pika.bgSoft))
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 8) {
+            Text("No books yet")
+                .font(.system(size: 22, weight: .bold))
+                .foregroundStyle(Pika.ink)
+            Text("Your first monthly book is one tap away.")
+                .font(.system(size: 15))
+                .foregroundStyle(Pika.inkSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 56)
+    }
+}
+
+/// The photo IS the card: edge-to-edge cover, scrim, overlaid title.
+struct BookCard: View {
+    let run: SavedRun
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            Group {
+                if let data = run.coverThumbJPEG, let img = UIImage(data: data) {
+                    Color.clear.overlay(
+                        Image(uiImage: img).resizable().scaledToFill()
+                    )
+                } else {
+                    Pika.bgSoft.overlay(
+                        Image(systemName: "book.pages")
+                            .font(.system(size: 40))
+                            .foregroundStyle(Pika.inkSecondary)
+                    )
                 }
             }
-            .navigationTitle("Pikabook")
+            .frame(height: 300)
+            .clipped()
+            .overlay(Scrim())
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(run.title)
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                Text("\(run.monthLabel) · \(run.selections.count) photos")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.white.opacity(0.85))
+            }
+            .padding(18)
         }
+        .clipShape(RoundedRectangle(cornerRadius: Pika.cardRadius))
+        .pikaShadow()
     }
 }
 
@@ -123,76 +220,74 @@ struct BooksTab: View {
 struct SavedBookView: View {
     let run: SavedRun
     @State private var images: [String: UIImage] = [:]
-    @State private var confirmDelete = false
     @State private var currentPage = -1
     @State private var shareURL: String?
     @State private var shareID: String?
     @State private var shareStatus: String?
     @State private var showShareSheet = false
     @State private var showFeedback = false
+    @State private var showActions = false
+    @State private var confirmDelete = false
     @Environment(\.dismiss) private var dismiss
 
     private var pages: [SavedRun.Selection] { run.selections.sorted { $0.page < $1.page } }
 
     var body: some View {
         TabView(selection: $currentPage) {
-            VStack(spacing: 16) {
-                if let img = images[run.coverAssetID] {
-                    Image(uiImage: img).resizable().scaledToFit().clipShape(RoundedRectangle(cornerRadius: 12))
-                }
-                Text(run.title).font(.title).bold().multilineTextAlignment(.center)
+            // Cover
+            VStack(spacing: 20) {
+                photo(run.coverAssetID)
+                Text(run.title)
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundStyle(Pika.ink)
+                    .multilineTextAlignment(.center)
+                Text(run.monthLabel)
+                    .font(.system(size: 15))
+                    .foregroundStyle(Pika.inkSecondary)
             }
-            .padding().tag(-1)
+            .padding(20).tag(-1)
 
             ForEach(pages, id: \.page) { sel in
-                VStack(spacing: 12) {
-                    if let img = images[sel.assetID] {
-                        Image(uiImage: img).resizable().scaledToFit().clipShape(RoundedRectangle(cornerRadius: 12))
-                    } else {
-                        ProgressView()
-                    }
-                    Text("page \(sel.page)").font(.caption).foregroundStyle(.secondary)
+                VStack(spacing: 14) {
+                    photo(sel.assetID)
+                    Text("\(sel.page) of \(pages.count)")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Pika.inkSecondary)
                 }
-                .padding().tag(sel.page)
+                .padding(20).tag(sel.page)
             }
         }
-        .tabViewStyle(.page)
+        .tabViewStyle(.page(indexDisplayMode: .automatic))
+        .indexViewStyle(.page(backgroundDisplayMode: .never))
+        .background(Pika.bg)
         .navigationTitle(run.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button { showFeedback = true } label: {
-                    Image(systemName: "bubble.left")
-                }
-                .disabled(shareID == nil && shareURL == nil)
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                if shareStatus != nil {
-                    ProgressView()
-                } else {
-                    Button { Task { await share() } } label: {
-                        Image(systemName: "square.and.arrow.up")
-                    }
+                Button { Task { await share() } } label: {
+                    Image(systemName: "square.and.arrow.up")
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button(role: .destructive) { confirmDelete = true } label: {
-                    Image(systemName: "trash")
+                Button { showActions = true } label: {
+                    Image(systemName: "ellipsis")
                 }
             }
         }
         .safeAreaInset(edge: .bottom) {
             if let status = shareStatus {
-                Text(status).font(.caption).foregroundStyle(.secondary)
-                    .padding(6).frame(maxWidth: .infinity).background(.thinMaterial)
+                Text(status)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Pika.inkSecondary)
+                    .padding(8)
+                    .frame(maxWidth: .infinity)
+                    .background(.thinMaterial)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .confirmationDialog("Delete this book?", isPresented: $confirmDelete, titleVisibility: .visible) {
-            Button("Delete \(run.title)", role: .destructive) {
-                RunStore.shared.delete(run.id)
-                dismiss()
-            }
-        }
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: shareStatus)
+        .sheet(isPresented: $showActions) { actionsSheet }
+        .sheet(isPresented: $confirmDelete) { deleteSheet }
         .sheet(isPresented: $showShareSheet) {
             if let shareURL, let url = URL(string: shareURL) {
                 ActivityView(items: [url])
@@ -204,6 +299,7 @@ struct SavedBookView: View {
                               page: currentPage == -1 ? 0 : currentPage,
                               pageLabel: currentPage == -1 ? "cover" : "page \(currentPage)")
                     .presentationDetents([.medium])
+                    .presentationCornerRadius(Pika.sheetRadius)
             }
         }
         .task {
@@ -211,25 +307,140 @@ struct SavedBookView: View {
             shareID = run.shareID
             let ids = pages.map(\.assetID) + [run.coverAssetID]
             images = await AssetLoader.load(ids: Array(Set(ids)), size: CGSize(width: 1600, height: 1600))
+            #if DEBUG
+            switch ProcessInfo.processInfo.environment["PIKA_SCREEN"] {
+            case "actions": showActions = true
+            case "delete": confirmDelete = true
+            case "feedback": shareID = shareID ?? "mock-design-preview"; showFeedback = true
+            default: break
+            }
+            #endif
         }
     }
 
-    private func share() async {
-        if shareURL != nil {  // already uploaded — straight to the share sheet
-            showShareSheet = true
-            return
+    @ViewBuilder
+    private func photo(_ assetID: String) -> some View {
+        if let img = images[assetID] {
+            Image(uiImage: img)
+                .resizable().scaledToFit()
+                .clipShape(RoundedRectangle(cornerRadius: Pika.cardRadius))
+                .pikaShadow()
+        } else {
+            RoundedRectangle(cornerRadius: Pika.cardRadius)
+                .fill(Pika.bgSoft)
+                .aspectRatio(4 / 3, contentMode: .fit)
+                .overlay(ProgressView())
         }
+    }
+
+    private var actionsSheet: some View {
+        VStack(spacing: 12) {
+            Capsule().fill(Pika.hairline).frame(width: 36, height: 4).padding(.top, 10)
+            Text(run.title)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Pika.ink)
+                .padding(.top, 4)
+
+            VStack(spacing: 10) {
+                Button {
+                    showActions = false
+                    Task { await share() }
+                } label: {
+                    Label("Share book", systemImage: "square.and.arrow.up")
+                }
+                .buttonStyle(PillButtonStyle())
+
+                Button {
+                    showActions = false
+                    Task { await openFeedback() }
+                } label: {
+                    Label(currentPage == -1 ? "Feedback on cover" : "Feedback on page \(currentPage)",
+                          systemImage: "bubble.left")
+                }
+                .buttonStyle(PillButtonStyle(filled: false))
+
+                Button {
+                    showActions = false
+                    confirmDelete = true
+                } label: {
+                    Label("Delete book", systemImage: "trash")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.red)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            Spacer(minLength: 12)
+        }
+        .presentationDetents([.height(276)])
+        .presentationCornerRadius(Pika.sheetRadius)
+        .background(Pika.bg)
+    }
+
+    private var deleteSheet: some View {
+        VStack(spacing: 14) {
+            Capsule().fill(Pika.hairline).frame(width: 36, height: 4).padding(.top, 10)
+            Text("Delete this book?")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(Pika.ink)
+                .padding(.top, 8)
+            Text("\"\(run.title)\" will be removed from your books. Your photos stay in your library.")
+                .font(.system(size: 15))
+                .foregroundStyle(Pika.inkSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+
+            Button("Delete book") {
+                confirmDelete = false
+                RunStore.shared.delete(run.id)
+                dismiss()
+            }
+            .font(.system(size: 16, weight: .semibold))
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(Capsule().fill(.red))
+            .padding(.horizontal, 20)
+
+            Button("Cancel") { confirmDelete = false }
+                .buttonStyle(PillButtonStyle(filled: false))
+                .padding(.horizontal, 20)
+            Spacer(minLength: 12)
+        }
+        .presentationDetents([.height(310)])
+        .presentationCornerRadius(Pika.sheetRadius)
+        .background(Pika.bg)
+    }
+
+    private func share() async {
+        guard await ensureShared() else { return }
+        showShareSheet = true
+    }
+
+    /// Feedback works before the book was ever shared: lazily create the
+    /// server book on first tap, exactly like share does.
+    private func openFeedback() async {
+        guard await ensureShared() else { return }
+        showFeedback = true
+    }
+
+    /// Uploads once, caches the link on the run; returns false on failure.
+    private func ensureShared() async -> Bool {
+        if shareURL != nil, shareID != nil { return true }
         do {
             let result = try await ShareClient.upload(run: run) { shareStatus = $0 }
             shareStatus = nil
             shareURL = result.url
             shareID = result.shareID
             RunStore.shared.setShare(id: run.id, shareURL: result.url, shareID: result.shareID)
-            showShareSheet = true
+            return true
         } catch {
             shareStatus = "share failed: \(error)"
             try? await Task.sleep(for: .seconds(4))
             shareStatus = nil
+            return false
         }
     }
 }
@@ -245,42 +456,66 @@ struct FeedbackSheet: View {
     @State private var status: String?
     @Environment(\.dismiss) private var dismiss
 
+    private let reactions: [(String, String)] = [("love", "❤️"), ("meh", "😐"), ("cut", "✂️")]
+
     var body: some View {
-        NavigationStack {
-            Form {
-                Picker("Reaction", selection: $reaction) {
-                    Text("❤️ Love").tag(String?.some("love"))
-                    Text("😐 Meh").tag(String?.some("meh"))
-                    Text("✂️ Cut").tag(String?.some("cut"))
-                    Text("none").tag(String?.none)
-                }
-                .pickerStyle(.segmented)
-                TextField("Details (optional)", text: $text, axis: .vertical)
-                    .lineLimit(3...6)
-                if let status { Text(status).font(.caption).foregroundStyle(.secondary) }
-            }
-            .navigationTitle("Feedback · \(pageLabel)")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Send") {
-                        Task {
-                            status = "sending…"
-                            do {
-                                try await ShareClient.sendFeedback(
-                                    shareID: shareID, page: page,
-                                    reaction: reaction, text: text)
-                                dismiss()
-                            } catch { status = "failed: \(error)" }
+        VStack(spacing: 16) {
+            Capsule().fill(Pika.hairline).frame(width: 36, height: 4).padding(.top, 10)
+            Text("Feedback · \(pageLabel)")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Pika.ink)
+
+            HStack(spacing: 14) {
+                ForEach(reactions, id: \.0) { key, emoji in
+                    Button {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            reaction = (reaction == key) ? nil : key
                         }
+                    } label: {
+                        Text(emoji)
+                            .font(.system(size: 30))
+                            .frame(width: 64, height: 56)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(reaction == key ? Pika.accent.opacity(0.12) : Pika.bgSoft)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(reaction == key ? Pika.accent : .clear, lineWidth: 1.5)
+                            )
+                            .scaleEffect(reaction == key ? 1.06 : 1)
                     }
-                    .disabled(reaction == nil && text.isEmpty)
-                }
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
                 }
             }
+
+            TextField("Add details (optional)", text: $text, axis: .vertical)
+                .lineLimit(3...5)
+                .padding(12)
+                .background(RoundedRectangle(cornerRadius: 12).fill(Pika.bgSoft))
+                .padding(.horizontal, 20)
+
+            if let status {
+                Text(status).font(.system(size: 13)).foregroundStyle(Pika.inkSecondary)
+            }
+
+            Button("Send feedback") {
+                Task {
+                    status = "sending…"
+                    do {
+                        try await ShareClient.sendFeedback(
+                            shareID: shareID, page: page,
+                            reaction: reaction, text: text)
+                        dismiss()
+                    } catch { status = "failed: \(error)" }
+                }
+            }
+            .buttonStyle(PillButtonStyle())
+            .disabled(reaction == nil && text.isEmpty)
+            .opacity(reaction == nil && text.isEmpty ? 0.4 : 1)
+            .padding(.horizontal, 20)
+            Spacer(minLength: 12)
         }
+        .background(Pika.bg)
     }
 }
 
@@ -292,7 +527,7 @@ struct ActivityView: UIViewControllerRepresentable {
     func updateUIViewController(_ vc: UIActivityViewController, context: Context) {}
 }
 
-// MARK: - Sync (experiment tab)
+// MARK: - Sync (experiment tab; dev surface, light touch)
 
 struct SyncView: View {
     @State private var events: [WakeEvent] = []
@@ -304,7 +539,7 @@ struct SyncView: View {
                 HStack {
                     Text("Photos access")
                     Spacer()
-                    Text(label(for: authStatus)).foregroundStyle(.secondary)
+                    Text(label(for: authStatus)).foregroundStyle(Pika.inkSecondary)
                 }
                 if authStatus != .authorized {
                     Button("Request full access") {
@@ -319,12 +554,12 @@ struct SyncView: View {
                     events = WakeLog.load()
                 }
                 Text("Wake beacon: ntfy.sh/\(WakeLog.ntfyTopic)")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.caption).foregroundStyle(Pika.inkSecondary)
                     .textSelection(.enabled)
             }
             Section("Wake log (\(events.count))") {
                 if events.isEmpty {
-                    Text("No wakes recorded yet").foregroundStyle(.secondary)
+                    Text("No wakes recorded yet").foregroundStyle(Pika.inkSecondary)
                 }
                 ForEach(events) { e in
                     VStack(alignment: .leading, spacing: 2) {
@@ -332,14 +567,16 @@ struct SyncView: View {
                             Text(e.trigger).bold()
                             Spacer()
                             Text(e.timestamp, format: .dateTime.month().day().hour().minute())
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Pika.inkSecondary)
                         }
                         Text("new: \(e.newPhotos)  total: \(e.totalPhotos) \(e.note)")
-                            .font(.caption).foregroundStyle(.secondary)
+                            .font(.caption).foregroundStyle(Pika.inkSecondary)
                     }
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(Pika.bg)
         .navigationTitle("Background sync")
         .onAppear { events = WakeLog.load() }
         .refreshable { events = WakeLog.load() }
@@ -355,3 +592,72 @@ struct SyncView: View {
         }
     }
 }
+
+#if DEBUG
+/// Simulator-only: `PIKA_MOCK=1` seeds two fake saved books from the photo
+/// library so the Books tab can be designed against real-looking content.
+enum MockSeeder {
+    @MainActor
+    static func seedIfRequested() async {
+        func trace(_ s: String) {
+            let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent("mock-debug.txt")
+            let line = s + "\n"
+            if let h = try? FileHandle(forWritingTo: url) { h.seekToEndOfFile(); h.write(Data(line.utf8)) }
+            else { try? line.write(to: url, atomically: true, encoding: .utf8) }
+        }
+        guard ProcessInfo.processInfo.environment["PIKA_MOCK"] == "1",
+              RunStore.shared.runs.isEmpty else { return }
+
+        // No PhotoKit: read JPEGs copied into Documents/mock-photos (permission
+        // prompts can't be answered in an unattended simulator).
+        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("mock-photos")
+        let files = ((try? FileManager.default.contentsOfDirectory(atPath: dir.path)) ?? [])
+            .filter { $0.lowercased().hasSuffix(".jpg") || $0.lowercased().hasSuffix(".jpeg") }
+            .sorted()
+        trace("mock-photos files=\(files.count)")
+        guard files.count >= 4 else { return }
+        let ids = files.prefix(12).map { "mock:\($0)" }
+
+        let thumbs = await AssetLoader.load(ids: [ids[0], ids[min(6, ids.count - 1)]],
+                                            size: CGSize(width: 600, height: 600))
+        func run(title: String, month: String, cover: String, pageIDs: [String]) -> SavedRun {
+            SavedRun(id: UUID(), createdAt: Date(), monthLabel: month, title: title,
+                     coverAssetID: cover,
+                     selections: pageIDs.enumerated().map { .init(assetID: $1, page: $0 + 1) },
+                     totalSeconds: 42, judgeInfo: "mock",
+                     coverThumbJPEG: thumbs[cover]?.jpegData(compressionQuality: 0.8))
+        }
+        let half = ids.count / 2
+        RunStore.shared.add(run(title: "Beach Days & Disney Castles", month: "May 2026",
+                                cover: ids[0], pageIDs: Array(ids[0..<half])))
+        RunStore.shared.add(run(title: "Carson's Summer of Sunshine", month: "July 2026",
+                                cover: ids[min(6, ids.count - 1)], pageIDs: Array(ids[half...])))
+
+        // Mock people so the People grid can be designed against content.
+        if PeopleStore.shared.clusters.isEmpty {
+            let specs: [(String, PersonCluster.Role, Int)] = [
+                ("Travisse", .required, 198), ("Steph", .required, 211),
+                ("Carson", .required, 356), ("", .neutral, 24), ("", .excluded, 9),
+            ]
+            for (i, spec) in specs.enumerated() {
+                let file = files[min(i, files.count - 1)]
+                let img = UIImage(contentsOfFile: dir.appendingPathComponent(file).path)
+                let side = min(img?.size.width ?? 200, img?.size.height ?? 200) / 2
+                let crop = img.flatMap { im -> UIImage? in
+                    let r = UIGraphicsImageRenderer(size: CGSize(width: 200, height: 200))
+                    return r.image { _ in
+                        im.draw(in: CGRect(x: -side / 4, y: -side / 4, width: 400, height: 400 * (im.size.height / max(im.size.width, 1))))
+                    }
+                }
+                PeopleStore.shared.clusters.append(PersonCluster(
+                    id: UUID(), name: spec.0, role: spec.1,
+                    centroid: [], count: spec.2,
+                    repCropPNG: crop?.pngData()))
+            }
+            PeopleStore.shared.save()
+        }
+    }
+}
+#endif

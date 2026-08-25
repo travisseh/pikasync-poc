@@ -13,72 +13,120 @@ struct PipelineView: View {
     }
 
     var body: some View {
-        List {
-            Section("Run") {
-                Picker("Month", selection: $month) {
-                    ForEach(monthOptions, id: \.self) { m in
-                        Text(m.formatted(.dateTime.month(.wide).year())).tag(m)
-                    }
-                }
-                Button(runner.running ? "Running…" : "Run pipeline") {
-                    Task { await runner.run(month: month) }
-                }
-                .disabled(runner.running)
-                HStack {
-                    Text("Status")
-                    Spacer()
-                    Text(runner.status).foregroundStyle(.secondary)
-                }
-                if runner.running && runner.progress > 0 {
-                    ProgressView(value: runner.progress)
-                }
-                if let err = runner.errorText {
-                    Text(err).font(.caption).foregroundStyle(.red)
-                }
-            }
-
-            if !runner.stageTimes.isEmpty {
-                Section("Stage timings") {
-                    ForEach(runner.stageTimes) { st in
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack {
-                                Text(st.name).bold()
-                                Spacer()
-                                Text(String(format: "%.1fs", st.seconds)).foregroundStyle(.secondary)
-                            }
-                            Text(st.detail).font(.caption).foregroundStyle(.secondary)
+        ScrollView {
+            VStack(spacing: 20) {
+                // Month + run
+                VStack(spacing: 14) {
+                    Picker("Month", selection: $month) {
+                        ForEach(monthOptions, id: \.self) { m in
+                            Text(m.formatted(.dateTime.month(.wide).year())).tag(m)
                         }
                     }
-                    HStack {
-                        Text("Total").bold()
-                        Spacer()
-                        Text(String(format: "%.1fs", runner.stageTimes.reduce(0) { $0 + $1.seconds }))
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Button(runner.running ? "Making your book…" : "Make this month's book") {
+                        Task { await runner.run(month: month) }
+                    }
+                    .buttonStyle(PillButtonStyle())
+                    .disabled(runner.running)
+                    .opacity(runner.running ? 0.6 : 1)
+
+                    if runner.running {
+                        VStack(spacing: 6) {
+                            if runner.progress > 0 {
+                                ProgressView(value: runner.progress).tint(Pika.accent)
+                            } else {
+                                ProgressView().tint(Pika.accent)
+                            }
+                            Text(runner.status)
+                                .font(.system(size: 13))
+                                .foregroundStyle(Pika.inkSecondary)
+                        }
+                        .transition(.opacity)
+                    }
+                    if let err = runner.errorText {
+                        Text(err)
+                            .font(.system(size: 13))
+                            .foregroundStyle(.red)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-            }
+                .padding(20)
+                .background(RoundedRectangle(cornerRadius: Pika.cardRadius).fill(Pika.bgSoft))
 
-            if !runner.sheets.isEmpty {
-                Section("Contact sheets (\(runner.sheets.count))") {
-                    ScrollView(.horizontal) {
+                if runner.book != nil {
+                    Button {
+                        showBook = true
+                    } label: {
+                        Label("View your book", systemImage: "book.pages")
+                    }
+                    .buttonStyle(PillButtonStyle(filled: false))
+                }
+
+                if !runner.stageTimes.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Behind the scenes")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(Pika.ink)
+                        ForEach(runner.stageTimes) { st in
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    Text(st.name)
+                                        .font(.system(size: 15, weight: .medium))
+                                        .foregroundStyle(Pika.ink)
+                                    Spacer()
+                                    Text(String(format: "%.1fs", st.seconds))
+                                        .font(.system(size: 13))
+                                        .foregroundStyle(Pika.inkSecondary)
+                                }
+                                Text(st.detail)
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(Pika.inkSecondary)
+                            }
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                        }
                         HStack {
+                            Text("Total").font(.system(size: 15, weight: .semibold)).foregroundStyle(Pika.ink)
+                            Spacer()
+                            Text(String(format: "%.1fs", runner.stageTimes.reduce(0) { $0 + $1.seconds }))
+                                .font(.system(size: 13)).foregroundStyle(Pika.inkSecondary)
+                        }
+                        if !runner.judgeInfo.isEmpty {
+                            Text(runner.judgeInfo)
+                                .font(.system(size: 12))
+                                .foregroundStyle(Pika.inkSecondary)
+                        }
+                    }
+                    .padding(20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: Pika.cardRadius)
+                            .fill(Color.white)
+                            .overlay(RoundedRectangle(cornerRadius: Pika.cardRadius).stroke(Pika.hairline, lineWidth: 1))
+                    )
+                    .animation(.spring(response: 0.35, dampingFraction: 0.8), value: runner.stageTimes.count)
+                }
+
+                if !runner.sheets.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
                             ForEach(Array(runner.sheets.enumerated()), id: \.offset) { _, img in
                                 Image(uiImage: img)
-                                    .resizable().scaledToFit().frame(height: 220)
-                                    .border(.gray.opacity(0.3))
+                                    .resizable().scaledToFit().frame(height: 200)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .pikaShadow()
                             }
                         }
+                        .padding(.vertical, 8)
                     }
                 }
             }
-
-            if runner.book != nil {
-                Section {
-                    Button("View book") { showBook = true }
-                    Text(runner.judgeInfo).font(.caption).foregroundStyle(.secondary)
-                }
-            }
+            .padding(20)
         }
-        .navigationTitle("Photobook pipeline")
+        .background(Pika.bg)
+        .navigationTitle("New book")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showBook) {
             if let book = runner.book {
                 BookView(book: book, shortlist: runner.shortlist, runner: runner)
@@ -99,29 +147,42 @@ struct BookView: View {
         NavigationStack {
             TabView {
                 // cover
-                VStack(spacing: 16) {
+                VStack(spacing: 20) {
                     if let img = images[book.cover_index] {
-                        Image(uiImage: img).resizable().scaledToFit().clipShape(RoundedRectangle(cornerRadius: 12))
+                        Image(uiImage: img).resizable().scaledToFit()
+                            .clipShape(RoundedRectangle(cornerRadius: Pika.cardRadius))
+                            .pikaShadow()
                     }
-                    Text(book.title).font(.title).bold().multilineTextAlignment(.center)
+                    Text(book.title)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundStyle(Pika.ink)
+                        .multilineTextAlignment(.center)
                 }
-                .padding()
+                .padding(20)
                 .tag(-1)
 
                 ForEach(pages) { sel in
-                    VStack(spacing: 12) {
+                    VStack(spacing: 14) {
                         if let img = images[sel.index] {
-                            Image(uiImage: img).resizable().scaledToFit().clipShape(RoundedRectangle(cornerRadius: 12))
+                            Image(uiImage: img).resizable().scaledToFit()
+                                .clipShape(RoundedRectangle(cornerRadius: Pika.cardRadius))
+                                .pikaShadow()
                         } else {
-                            ProgressView()
+                            RoundedRectangle(cornerRadius: Pika.cardRadius)
+                                .fill(Pika.bgSoft)
+                                .aspectRatio(4 / 3, contentMode: .fit)
+                                .overlay(ProgressView())
                         }
-                        Text("page \(sel.page)").font(.caption).foregroundStyle(.secondary)
+                        Text("\(sel.page) of \(pages.count)")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Pika.inkSecondary)
                     }
-                    .padding()
+                    .padding(20)
                     .tag(sel.page)
                 }
             }
             .tabViewStyle(.page)
+            .background(Pika.bg)
             .navigationTitle(book.title)
             .navigationBarTitleDisplayMode(.inline)
             .task { await loadImages() }
