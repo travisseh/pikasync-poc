@@ -35,7 +35,8 @@ enum ShareClient {
         struct UploadResp: Codable { let storageId: String }
         var pages: [[String: Any]] = []
         for (i, assetID) in ordered.enumerated() {
-            guard let img = images[assetID], let jpeg = img.jpegData(compressionQuality: 0.8) else {
+            guard let img = images[assetID],
+                  let jpeg = normalized(img).jpegData(compressionQuality: 0.8) else {
                 throw PipelineError.message("couldn't load photo for page \(i)")
             }
             await progress("uploading \(i + 1)/\(ordered.count)…")
@@ -68,6 +69,18 @@ enum ShareClient {
         if let text, !text.isEmpty { body["text"] = text }
         struct OkResp: Codable { let ok: Bool }
         let _: OkResp = try await postJSON(path: "/feedback", body: body)
+    }
+
+    /// Bake orientation into pixels: UIImage's EXIF-style orientation flag is
+    /// unreliable once the JPEG leaves the device (web browsers saw sideways
+    /// photos). Rendering through UIGraphicsImageRenderer always outputs .up.
+    private static func normalized(_ img: UIImage) -> UIImage {
+        guard img.imageOrientation != .up else { return img }
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        return UIGraphicsImageRenderer(size: img.size, format: format).image { _ in
+            img.draw(in: CGRect(origin: .zero, size: img.size))
+        }
     }
 
     private static func postJSON<T: Decodable>(path: String, body: [String: Any]) async throws -> T {
