@@ -17,6 +17,8 @@ struct SavedRun: Codable, Identifiable {
     let totalSeconds: Double
     let judgeInfo: String
     var coverThumbJPEG: Data?
+    var shareURL: String? = nil  // cached share link once uploaded
+    var shareID: String? = nil   // Convex shareId (feedback capability token)
 }
 
 final class RunStore: ObservableObject {
@@ -42,6 +44,13 @@ final class RunStore: ObservableObject {
 
     func delete(_ id: UUID) {
         runs.removeAll { $0.id == id }
+        save()
+    }
+
+    func setShare(id: UUID, shareURL: String, shareID: String) {
+        guard let i = runs.firstIndex(where: { $0.id == id }) else { return }
+        runs[i].shareURL = shareURL
+        runs[i].shareID = shareID
         save()
     }
 
