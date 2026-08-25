@@ -24,30 +24,45 @@ enum RemoteCommand {
               let cmd = try? JSONDecoder().decode(Command.self, from: data) else { return }
         try? FileManager.default.removeItem(at: url)  // consume before executing: never double-run
 
-        guard let monthStr = cmd.month else { return }
         let df = DateFormatter()
         df.dateFormat = "yyyy-MM"
-        guard let month = df.date(from: monthStr) else {
+        let monthStr = cmd.month ?? ""
+        let month = df.date(from: monthStr)
+        if cmd.action != "bgtick" && month == nil {
             RunStatusLog.write(month: monthStr, status: "failed", error: "bad month in command.json",
                                stages: [], trigger: "remote")
             return
         }
 
         executing = true
-        WakeLog.record(trigger: "remote_cmd", newPhotos: 0, totalPhotos: 0, note: "\(cmd.action) for \(monthStr)")
+        WakeLog.record(trigger: "remote_cmd", newPhotos: 0, totalPhotos: 0, note: "\(cmd.action) \(monthStr)")
         Task { @MainActor in
             defer { executing = false }
             switch cmd.action {
+            case "resetMonth":
+                // Re-arm background generation: the marker is keyed by the month
+                // the wake runs in (e.g. 2026-08 builds July), so pass that key.
+                let marker = "autoBook-\(monthStr)"
+                let was = UserDefaults.standard.bool(forKey: marker)
+                UserDefaults.standard.removeObject(forKey: marker)
+                AutoBookState.clear()
+                RunStatusLog.write(month: monthStr, status: "reset", error: nil,
+                                   stages: ["marker \(marker) was \(was ? "set" : "unset"), now cleared; autobook-state cleared"],
+                                   trigger: "remote-reset")
+                WakeLog.record(trigger: "remote_cmd", newPhotos: 0, totalPhotos: 0, note: "reset \(marker) (was \(was))")
+            case "bgtick":
+                await AutoBook.tick(trigger: "remote")
+                RunStatusLog.write(month: monthStr, status: "bgtick complete", error: nil, stages: [], trigger: "remote-bgtick")
             case "run":
                 let runner = PipelineRunner()
                 runner.trigger = "remote"
-                await runner.run(month: month)
+                await runner.run(month: month!)
                 WakeLog.record(trigger: "remote_cmd", newPhotos: runner.book?.selections.count ?? -1,
                                totalPhotos: 0, note: runner.errorText.map { "failed: \($0.prefix(120))" } ?? "book ready")
             case "score":
                 // Fill the incremental score store only (no judge) so a later
                 // bg_refresh wake can finish the book within its ~30s budget.
-                let r = await IncrementalScorer.scoreChunk(month: month, budget: nil)
+                let r = await IncrementalScorer.scoreChunk(month: month!, budget: nil)
                 RunStatusLog.write(month: monthStr, status: r.complete ? "scored" : "score incomplete",
                                    error: nil, stages: ["\(r.total) in month, \(r.newlyScored) newly scored"],
                                    trigger: "remote-score")

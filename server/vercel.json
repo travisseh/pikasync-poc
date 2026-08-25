@@ -1,8 +1,10 @@
 {
   "functions": {
-    "api/judge.ts": {
-      "maxDuration": 300,
-      "memory": 1024
-    }
-  }
+    "api/judge.ts": { "maxDuration": 300, "memory": 1024 },
+    "api/judge-submit.ts": { "maxDuration": 300, "memory": 1024 }
+  },
+  "rewrites": [
+    { "source": "/api/judge/submit", "destination": "/api/judge-submit" },
+    { "source": "/api/judge/result", "destination": "/api/judge-result" }
+  ]
 }

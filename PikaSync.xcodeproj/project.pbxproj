@@ -10,7 +10,9 @@
 		010EEDF5CF05D6E5D7837E18 /* FaceEmbedding.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = B61B3D54A90144B7B9F42955 /* FaceEmbedding.mlpackage */; };
 		01636CC98A07620943F67F00 /* PeoplePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */; };
 		0362D6C88E3DDAF258E7CD3C /* CreateFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D09156D78D7CF7FF364716 /* CreateFlow.swift */; };
+		052AC12543E0B897B4CBE775 /* AutoBookState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C612A5C4C7DD7B36517BBD27 /* AutoBookState.swift */; };
 		0B9E783212421D2B0EFEF2C6 /* ContactSheetRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */; };
+		0F51B462C25D69302D1B997F /* AutoBookState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C612A5C4C7DD7B36517BBD27 /* AutoBookState.swift */; };
 		0FD46C4808A9F5BE23C6F5B3 /* FaceEmbedder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B093237EA24679EBDAB4454F /* FaceEmbedder.swift */; };
 		127D44500723AA9C7500E0D4 /* PeopleScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFE323F5B3C8AB3FE1A89DD /* PeopleScanner.swift */; };
 		17DA1811721141E937CB95B3 /* ShareClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4187DB0C130D4E1B7A2E0E11 /* ShareClient.swift */; };
@@ -92,6 +94,7 @@
 		B093237EA24679EBDAB4454F /* FaceEmbedder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceEmbedder.swift; sourceTree = "<group>"; };
 		B61B3D54A90144B7B9F42955 /* FaceEmbedding.mlpackage */ = {isa = PBXFileReference; path = FaceEmbedding.mlpackage; sourceTree = "<group>"; };
 		C4D3EA9AFA6AD90013E1DD09 /* PikaSync.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikaSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C612A5C4C7DD7B36517BBD27 /* AutoBookState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoBookState.swift; sourceTree = "<group>"; };
 		D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSheetRenderer.swift; sourceTree = "<group>"; };
 		D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncIntent.swift; sourceTree = "<group>"; };
 		D8CC4E8106D94359D19F6A32 /* PikabookTF.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikabookTF.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,6 +112,7 @@
 			children = (
 				74AAFE69AD28336C82801908 /* AssetLoader.swift */,
 				FB66E6C656A87E221C65E6D1 /* AutoBook.swift */,
+				C612A5C4C7DD7B36517BBD27 /* AutoBookState.swift */,
 				D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */,
 				83D09156D78D7CF7FF364716 /* CreateFlow.swift */,
 				B093237EA24679EBDAB4454F /* FaceEmbedder.swift */,
@@ -311,6 +315,7 @@
 			files = (
 				F968DBE3C22AE4C792D02DC0 /* AssetLoader.swift in Sources */,
 				E0AF3797B6E6AC8173ACABD6 /* AutoBook.swift in Sources */,
+				0F51B462C25D69302D1B997F /* AutoBookState.swift in Sources */,
 				0B9E783212421D2B0EFEF2C6 /* ContactSheetRenderer.swift in Sources */,
 				0362D6C88E3DDAF258E7CD3C /* CreateFlow.swift in Sources */,
 				0FD46C4808A9F5BE23C6F5B3 /* FaceEmbedder.swift in Sources */,
@@ -354,6 +359,7 @@
 			files = (
 				834EC773A93D8B651C607A53 /* AssetLoader.swift in Sources */,
 				F638CA6EFC2585E79C32044E /* AutoBook.swift in Sources */,
+				052AC12543E0B897B4CBE775 /* AutoBookState.swift in Sources */,
 				CA80745157BFB7428BD797D5 /* ContactSheetRenderer.swift in Sources */,
 				56730A64040CA84871AF743B /* CreateFlow.swift in Sources */,
 				DA1549D435EE915AD5FF55CB /* FaceEmbedder.swift in Sources */,
