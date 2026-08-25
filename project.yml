@@ -17,14 +17,22 @@ targets:
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "PikaSync tests background access to your photo library."
         INFOPLIST_KEY_UIBackgroundModes: "fetch processing remote-notification"
         GENERATE_INFOPLIST_FILE: YES
-        CURRENT_PROJECT_VERSION: 1
+        CURRENT_PROJECT_VERSION: 2
         MARKETING_VERSION: 0.1.0
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     info:
       path: Sources/Info.plist
       properties:
         NSPhotoLibraryUsageDescription: "PikaSync tests background access to your photo library."
         UIBackgroundModes: [fetch, processing, remote-notification]
+        ITSAppUsesNonExemptEncryption: false
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         BGTaskSchedulerPermittedIdentifiers:
           - com.travisse.pikasync.refresh
           - com.travisse.pikasync.process
