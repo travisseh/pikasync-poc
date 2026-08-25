@@ -7,36 +7,63 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		010EEDF5CF05D6E5D7837E18 /* FaceEmbedding.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = B61B3D54A90144B7B9F42955 /* FaceEmbedding.mlpackage */; };
+		01636CC98A07620943F67F00 /* PeoplePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */; };
 		0362D6C88E3DDAF258E7CD3C /* CreateFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D09156D78D7CF7FF364716 /* CreateFlow.swift */; };
 		0B9E783212421D2B0EFEF2C6 /* ContactSheetRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */; };
 		0FD46C4808A9F5BE23C6F5B3 /* FaceEmbedder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B093237EA24679EBDAB4454F /* FaceEmbedder.swift */; };
+		127D44500723AA9C7500E0D4 /* PeopleScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFE323F5B3C8AB3FE1A89DD /* PeopleScanner.swift */; };
+		17DA1811721141E937CB95B3 /* ShareClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4187DB0C130D4E1B7A2E0E11 /* ShareClient.swift */; };
+		2198B461A117E5331A614E67 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86608F9EE1B1871912091AB3 /* Assets.xcassets */; };
 		242FA215F37DDF754631646A /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C79CFB46F1024878927C55 /* SyncEngine.swift */; };
 		258BEFA1C82C58DF046991A3 /* WakeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAEDF624447F6C43243796F /* WakeLog.swift */; };
 		2E9F6FBE19781CEAE9793174 /* PipelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 914E68CA1E5E3FC3847853AB /* PipelineView.swift */; };
+		2EB132509EDCDE044E738FB5 /* PikaSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF771AC045A10D44432855EB /* PikaSyncApp.swift */; };
 		3CBEB31C4A85617EADD25CEC /* SyncIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */; };
+		438137149062073B58A11543 /* PeopleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED070F39260B1772B9FB974C /* PeopleStore.swift */; };
 		464238A4ECA779125DF2CC71 /* FaceIDBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */; };
 		4A6B51980B3ED2C0AADEAB45 /* BGApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F6068E0F6E73F6E889D3FB /* BGApp.swift */; };
 		4DB1AAA2854A219EDA0B9FAE /* FaceEmbedding.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = B61B3D54A90144B7B9F42955 /* FaceEmbedding.mlpackage */; };
+		56730A64040CA84871AF743B /* CreateFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D09156D78D7CF7FF364716 /* CreateFlow.swift */; };
 		60D8005890AAE5E5248D5018 /* WakeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAEDF624447F6C43243796F /* WakeLog.swift */; };
 		62CEA496266926F5C1A1E4F7 /* PikaSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF771AC045A10D44432855EB /* PikaSyncApp.swift */; };
 		6D5CC45ABBE70DC547B06E4D /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C79CFB46F1024878927C55 /* SyncEngine.swift */; };
+		6DB1F6F3BD3F257323F0A32B /* VisionScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3381FEE037C5170449DEAD88 /* VisionScorer.swift */; };
+		82ABB434900E1727D4E8A8B3 /* PipelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 914E68CA1E5E3FC3847853AB /* PipelineView.swift */; };
+		834EC773A93D8B651C607A53 /* AssetLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74AAFE69AD28336C82801908 /* AssetLoader.swift */; };
+		960CBE6F599918A1AD48F459 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06985FAD552338141D65F423 /* Secrets.swift */; };
+		96BB1EEC8D5199A698B4B84E /* FaceIDBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */; };
+		96F11FC29E4BB5DB5A5EF841 /* RemoteCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF9BB1706941D3074E5B2EC /* RemoteCommand.swift */; };
+		9992391449C7BC5CAD2A1D46 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE6A140D122087AD716AEA7 /* Theme.swift */; };
+		9ACBDC116780B2FE10CC7E88 /* RunStatusLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249C93078D8EE26D11ED359F /* RunStatusLog.swift */; };
+		9C99EAA2075909A85A7E4F39 /* RunStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3067CD55884C0BBEE7EF181D /* RunStore.swift */; };
 		A470DD0E31F36FF60B600B95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86608F9EE1B1871912091AB3 /* Assets.xcassets */; };
 		A6A9B1223B827877780F5AC4 /* PeopleScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFE323F5B3C8AB3FE1A89DD /* PeopleScanner.swift */; };
 		A75359DA463DFA82116988D4 /* PeoplePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */; };
 		A7DB15953428C6938B99E4A0 /* Secrets.example.swift.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0642578F74527EE393AC9C5F /* Secrets.example.swift.txt */; };
+		AC1A233DACC0C3EFC213975F /* IncrementalScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BA830477CF75E6FDC4F375 /* IncrementalScorer.swift */; };
+		B107EA5F495D3B7037B0A859 /* WakeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAEDF624447F6C43243796F /* WakeLog.swift */; };
 		BB17ABC85415E935FF287ADD /* RunStatusLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249C93078D8EE26D11ED359F /* RunStatusLog.swift */; };
+		CA6965E31A4A3D5B432F442E /* PipelineRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */; };
+		CA80745157BFB7428BD797D5 /* ContactSheetRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */; };
 		CBED4365709F1372332B7359 /* JudgeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */; };
 		D15C8F72DCEEF518BE85A0E7 /* SyncIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */; };
 		D7274D2524D4EEF6EC912EB0 /* PipelineRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */; };
+		DA1549D435EE915AD5FF55CB /* FaceEmbedder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B093237EA24679EBDAB4454F /* FaceEmbedder.swift */; };
+		DA4D0A45FB6AA362E38ABB33 /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C79CFB46F1024878927C55 /* SyncEngine.swift */; };
 		DE994D60F440CA56D08ADCFD /* VisionScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3381FEE037C5170449DEAD88 /* VisionScorer.swift */; };
 		E0AF3797B6E6AC8173ACABD6 /* AutoBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB66E6C656A87E221C65E6D1 /* AutoBook.swift */; };
 		E348A9CB8A2BE185DECBADC2 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06985FAD552338141D65F423 /* Secrets.swift */; };
+		E48D845468FDC130D77ED55B /* JudgeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */; };
 		E605B4F905E539DDDFB8A77D /* PeopleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED070F39260B1772B9FB974C /* PeopleStore.swift */; };
+		E74F3E1F8DDD98B3D8CD4633 /* Secrets.example.swift.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0642578F74527EE393AC9C5F /* Secrets.example.swift.txt */; };
 		E98F6800FFC11A0C92BC6AC3 /* IncrementalScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BA830477CF75E6FDC4F375 /* IncrementalScorer.swift */; };
 		F17587EA5334C8DD36F7B952 /* ShareClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4187DB0C130D4E1B7A2E0E11 /* ShareClient.swift */; };
 		F456C6F722349218338ED905 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE6A140D122087AD716AEA7 /* Theme.swift */; };
+		F638CA6EFC2585E79C32044E /* AutoBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB66E6C656A87E221C65E6D1 /* AutoBook.swift */; };
 		F968DBE3C22AE4C792D02DC0 /* AssetLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74AAFE69AD28336C82801908 /* AssetLoader.swift */; };
 		FD8BED19C2C1CB1428B1B09A /* RunStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3067CD55884C0BBEE7EF181D /* RunStore.swift */; };
+		FE0BDAC2EDD63DDDE6CD6A4B /* SyncIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */; };
 		FE7118E4A74994AB5862A13B /* RemoteCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF9BB1706941D3074E5B2EC /* RemoteCommand.swift */; };
 /* End PBXBuildFile section */
 
@@ -67,6 +94,7 @@
 		C4D3EA9AFA6AD90013E1DD09 /* PikaSync.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikaSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSheetRenderer.swift; sourceTree = "<group>"; };
 		D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncIntent.swift; sourceTree = "<group>"; };
+		D8CC4E8106D94359D19F6A32 /* PikabookTF.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikabookTF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeoplePickerView.swift; sourceTree = "<group>"; };
 		E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceIDBridge.swift; sourceTree = "<group>"; };
 		ED070F39260B1772B9FB974C /* PeopleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleStore.swift; sourceTree = "<group>"; };
@@ -104,6 +132,7 @@
 		3D161EA72F20D00AC0B31653 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				D8CC4E8106D94359D19F6A32 /* PikabookTF.app */,
 				C4D3EA9AFA6AD90013E1DD09 /* PikaSync.app */,
 				8C0A3AF8C41D8EF6B382BBBB /* PikaSyncBG.app */,
 			);
@@ -174,6 +203,24 @@
 			productReference = 8C0A3AF8C41D8EF6B382BBBB /* PikaSyncBG.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A4D843DE4E15A10620791C4E /* PikabookTF */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 32A4F11BB53438CFC8232283 /* Build configuration list for PBXNativeTarget "PikabookTF" */;
+			buildPhases = (
+				F47876EE9F2488ADDBA5EF44 /* Sources */,
+				0663BA35C5C32A0502B484AA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PikabookTF;
+			packageProductDependencies = (
+			);
+			productName = PikabookTF;
+			productReference = D8CC4E8106D94359D19F6A32 /* PikabookTF.app */;
+			productType = "com.apple.product-type.application";
+		};
 		AC62A3A12D0B505DF4186E97 /* PikaSync */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1A3C3F1ED827DF9DE6B348E8 /* Build configuration list for PBXNativeTarget "PikaSync" */;
@@ -205,6 +252,10 @@
 						DevelopmentTeam = WWTV54KS97;
 						ProvisioningStyle = Automatic;
 					};
+					A4D843DE4E15A10620791C4E = {
+						DevelopmentTeam = WWTV54KS97;
+						ProvisioningStyle = Automatic;
+					};
 					AC62A3A12D0B505DF4186E97 = {
 						DevelopmentTeam = WWTV54KS97;
 						ProvisioningStyle = Automatic;
@@ -226,12 +277,22 @@
 			projectRoot = "";
 			targets = (
 				AC62A3A12D0B505DF4186E97 /* PikaSync */,
+				A4D843DE4E15A10620791C4E /* PikabookTF */,
 				7E4349DC1DB4688932F67F2F /* PikaSyncBG */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		0663BA35C5C32A0502B484AA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2198B461A117E5331A614E67 /* Assets.xcassets in Resources */,
+				E74F3E1F8DDD98B3D8CD4633 /* Secrets.example.swift.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FB6C851ACA55BCE146BD6253 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -287,9 +348,66 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F47876EE9F2488ADDBA5EF44 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				834EC773A93D8B651C607A53 /* AssetLoader.swift in Sources */,
+				F638CA6EFC2585E79C32044E /* AutoBook.swift in Sources */,
+				CA80745157BFB7428BD797D5 /* ContactSheetRenderer.swift in Sources */,
+				56730A64040CA84871AF743B /* CreateFlow.swift in Sources */,
+				DA1549D435EE915AD5FF55CB /* FaceEmbedder.swift in Sources */,
+				010EEDF5CF05D6E5D7837E18 /* FaceEmbedding.mlpackage in Sources */,
+				96BB1EEC8D5199A698B4B84E /* FaceIDBridge.swift in Sources */,
+				AC1A233DACC0C3EFC213975F /* IncrementalScorer.swift in Sources */,
+				E48D845468FDC130D77ED55B /* JudgeClient.swift in Sources */,
+				01636CC98A07620943F67F00 /* PeoplePickerView.swift in Sources */,
+				127D44500723AA9C7500E0D4 /* PeopleScanner.swift in Sources */,
+				438137149062073B58A11543 /* PeopleStore.swift in Sources */,
+				2EB132509EDCDE044E738FB5 /* PikaSyncApp.swift in Sources */,
+				CA6965E31A4A3D5B432F442E /* PipelineRunner.swift in Sources */,
+				82ABB434900E1727D4E8A8B3 /* PipelineView.swift in Sources */,
+				96F11FC29E4BB5DB5A5EF841 /* RemoteCommand.swift in Sources */,
+				9ACBDC116780B2FE10CC7E88 /* RunStatusLog.swift in Sources */,
+				9C99EAA2075909A85A7E4F39 /* RunStore.swift in Sources */,
+				960CBE6F599918A1AD48F459 /* Secrets.swift in Sources */,
+				17DA1811721141E937CB95B3 /* ShareClient.swift in Sources */,
+				DA4D0A45FB6AA362E38ABB33 /* SyncEngine.swift in Sources */,
+				FE0BDAC2EDD63DDDE6CD6A4B /* SyncIntent.swift in Sources */,
+				9992391449C7BC5CAD2A1D46 /* Theme.swift in Sources */,
+				6DB1F6F3BD3F257323F0A32B /* VisionScorer.swift in Sources */,
+				B107EA5F495D3B7037B0A859 /* WakeLog.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		015ABF047547FE3C40EA5E89 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WWTV54KS97;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PikabookTF-Info.plist";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Pikabook uses your photo library to create monthly photobooks.";
+				INFOPLIST_KEY_UIBackgroundModes = "fetch processing remote-notification";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.travisse.pikabook;
+				PRODUCT_NAME = Pikabook;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		23F8244C08E3126C265B0D73 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -376,6 +494,31 @@
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
+		};
+		3DDFAC020BCDF911B7ED4ED4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WWTV54KS97;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PikabookTF-Info.plist";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Pikabook uses your photo library to create monthly photobooks.";
+				INFOPLIST_KEY_UIBackgroundModes = "fetch processing remote-notification";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.travisse.pikabook;
+				PRODUCT_NAME = Pikabook;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
 		};
 		79974AD28FAC63ABA112BD20 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -513,6 +656,15 @@
 			buildConfigurations = (
 				23F8244C08E3126C265B0D73 /* Debug */,
 				CF4B148E3A281966497C4531 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		32A4F11BB53438CFC8232283 /* Build configuration list for PBXNativeTarget "PikabookTF" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				015ABF047547FE3C40EA5E89 /* Debug */,
+				3DDFAC020BCDF911B7ED4ED4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

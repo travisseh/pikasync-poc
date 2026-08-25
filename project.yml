@@ -38,6 +38,44 @@ targets:
         BGTaskSchedulerPermittedIdentifiers:
           - com.travisse.pikasync.refresh
           - com.travisse.pikasync.process
+  # TestFlight variant: same app, distribution bundle id. Dev installs keep
+  # using the PikaSync target/bundle so both can live on one phone.
+  PikabookTF:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+        excludes: ["Info.plist"]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.travisse.pikabook
+        PRODUCT_NAME: Pikabook
+        DEVELOPMENT_TEAM: WWTV54KS97
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Pikabook uses your photo library to create monthly photobooks."
+        INFOPLIST_KEY_UIBackgroundModes: "fetch processing remote-notification"
+        GENERATE_INFOPLIST_FILE: YES
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.2.0
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    info:
+      path: PikabookTF-Info.plist
+      properties:
+        CFBundleDisplayName: Pikabook
+        NSPhotoLibraryUsageDescription: "Pikabook uses your photo library to create monthly photobooks."
+        UIBackgroundModes: [fetch, processing, remote-notification]
+        ITSAppUsesNonExemptEncryption: false
+        UIDesignRequiresCompatibility: true
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.travisse.pikabook.refresh
+          - com.travisse.pikabook.process
   PikaSyncBG:
     type: application
     platform: iOS
