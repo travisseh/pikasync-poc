@@ -54,7 +54,7 @@ struct RootView: View {
             NavigationStack { PeoplePickerView(scanner: scanner) }
                 .tabItem { Label("People", systemImage: "person.2") }.tag(1)
             NavigationStack { SyncView() }
-                .tabItem { Label("Sync", systemImage: "arrow.triangle.2.circlepath") }.tag(2)
+                .tabItem { Label("Settings", systemImage: "gearshape") }.tag(2)
         }
         #if DEBUG
         .onAppear {
