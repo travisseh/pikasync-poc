@@ -26,6 +26,12 @@ enum AutoBook {
         guard let prevMonth = cal.date(byAdding: .month, value: -1, to: now) else { return }
         let prevKey = df.string(from: prevMonth)
         let generous = trigger == "bg_processing" || trigger == "remote"
+        // Experiment flag (set via remote command): prove the bg_refresh-only
+        // path by refusing to let processing wakes build the book.
+        if trigger == "bg_processing" && UserDefaults.standard.bool(forKey: "experiment.skipProcessing") {
+            WakeLog.record(trigger: "bg_book", newPhotos: 0, totalPhotos: 0, note: "processing wake skipped (refresh-only experiment)")
+            return
+        }
 
         if UserDefaults.standard.bool(forKey: marker) {
             // Book done — pre-score the current month in the leftover budget,

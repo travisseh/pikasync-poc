@@ -9,6 +9,8 @@ enum RemoteCommand {
     struct Command: Codable {
         let action: String
         let month: String?
+        let flag: String?
+        let value: Bool?
     }
 
     private static var url: URL {
@@ -50,6 +52,14 @@ enum RemoteCommand {
                                    stages: ["marker \(marker) was \(was ? "set" : "unset"), now cleared; autobook-state cleared"],
                                    trigger: "remote-reset")
                 WakeLog.record(trigger: "remote_cmd", newPhotos: 0, totalPhotos: 0, note: "reset \(marker) (was \(was))")
+            case "setFlag":
+                // {"action":"setFlag","month":"<any>","flag":"experiment.skipProcessing","value":true}
+                if let flag = cmd.flag {
+                    UserDefaults.standard.set(cmd.value ?? true, forKey: flag)
+                    RunStatusLog.write(month: monthStr, status: "flag set", error: nil,
+                                       stages: ["\(flag) = \(cmd.value ?? true)"], trigger: "remote-flag")
+                    WakeLog.record(trigger: "remote_cmd", newPhotos: 0, totalPhotos: 0, note: "flag \(flag)=\(cmd.value ?? true)")
+                }
             case "bgtick":
                 await AutoBook.tick(trigger: "remote")
                 RunStatusLog.write(month: monthStr, status: "bgtick complete", error: nil, stages: [], trigger: "remote-bgtick")
