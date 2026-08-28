@@ -27,8 +27,10 @@
 		4A6B51980B3ED2C0AADEAB45 /* BGApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F6068E0F6E73F6E889D3FB /* BGApp.swift */; };
 		4DB1AAA2854A219EDA0B9FAE /* FaceEmbedding.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = B61B3D54A90144B7B9F42955 /* FaceEmbedding.mlpackage */; };
 		56730A64040CA84871AF743B /* CreateFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D09156D78D7CF7FF364716 /* CreateFlow.swift */; };
+		5FF04AECBE3A7486977BF03B /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = E087CD1857609EA543F88C0E /* Onboarding.swift */; };
 		60D8005890AAE5E5248D5018 /* WakeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAEDF624447F6C43243796F /* WakeLog.swift */; };
 		62CEA496266926F5C1A1E4F7 /* PikaSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF771AC045A10D44432855EB /* PikaSyncApp.swift */; };
+		6D1F0A34D834EE8FCE752E3A /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = E087CD1857609EA543F88C0E /* Onboarding.swift */; };
 		6D5CC45ABBE70DC547B06E4D /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C79CFB46F1024878927C55 /* SyncEngine.swift */; };
 		6DB1F6F3BD3F257323F0A32B /* VisionScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3381FEE037C5170449DEAD88 /* VisionScorer.swift */; };
 		82ABB434900E1727D4E8A8B3 /* PipelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 914E68CA1E5E3FC3847853AB /* PipelineView.swift */; };
@@ -99,6 +101,7 @@
 		D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncIntent.swift; sourceTree = "<group>"; };
 		D8CC4E8106D94359D19F6A32 /* PikabookTF.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikabookTF.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeoplePickerView.swift; sourceTree = "<group>"; };
+		E087CD1857609EA543F88C0E /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
 		E4AFD9A311F1EA8EA6D1E4AA /* FaceIDBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceIDBridge.swift; sourceTree = "<group>"; };
 		ED070F39260B1772B9FB974C /* PeopleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleStore.swift; sourceTree = "<group>"; };
 		EEE6A140D122087AD716AEA7 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
@@ -166,6 +169,7 @@
 			children = (
 				86608F9EE1B1871912091AB3 /* Assets.xcassets */,
 				507E9248D4787B1306685615 /* Info.plist */,
+				E087CD1857609EA543F88C0E /* Onboarding.swift */,
 				AF771AC045A10D44432855EB /* PikaSyncApp.swift */,
 				0642578F74527EE393AC9C5F /* Secrets.example.swift.txt */,
 				06985FAD552338141D65F423 /* Secrets.swift */,
@@ -323,6 +327,7 @@
 				464238A4ECA779125DF2CC71 /* FaceIDBridge.swift in Sources */,
 				E98F6800FFC11A0C92BC6AC3 /* IncrementalScorer.swift in Sources */,
 				CBED4365709F1372332B7359 /* JudgeClient.swift in Sources */,
+				6D1F0A34D834EE8FCE752E3A /* Onboarding.swift in Sources */,
 				A75359DA463DFA82116988D4 /* PeoplePickerView.swift in Sources */,
 				A6A9B1223B827877780F5AC4 /* PeopleScanner.swift in Sources */,
 				E605B4F905E539DDDFB8A77D /* PeopleStore.swift in Sources */,
@@ -367,6 +372,7 @@
 				96BB1EEC8D5199A698B4B84E /* FaceIDBridge.swift in Sources */,
 				AC1A233DACC0C3EFC213975F /* IncrementalScorer.swift in Sources */,
 				E48D845468FDC130D77ED55B /* JudgeClient.swift in Sources */,
+				5FF04AECBE3A7486977BF03B /* Onboarding.swift in Sources */,
 				01636CC98A07620943F67F00 /* PeoplePickerView.swift in Sources */,
 				127D44500723AA9C7500E0D4 /* PeopleScanner.swift in Sources */,
 				438137149062073B58A11543 /* PeopleStore.swift in Sources */,
@@ -406,7 +412,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.travisse.pikabook;
 				PRODUCT_NAME = Pikabook;
 				SDKROOT = iphoneos;
@@ -518,7 +524,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.travisse.pikabook;
 				PRODUCT_NAME = Pikabook;
 				SDKROOT = iphoneos;

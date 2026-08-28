@@ -174,7 +174,7 @@ struct BuildingCard: View {
                     .font(.system(size: 19, weight: .semibold))
                     .foregroundStyle(Pika.ink)
                 if failed {
-                    Text("Couldn't make this book — tap for details")
+                    Text("Couldn't make this book. Tap for details")
                         .font(.system(size: 14))
                         .foregroundStyle(Pika.inkSecondary)
                 } else {

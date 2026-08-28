@@ -14,7 +14,9 @@ final class PeopleScanner: ObservableObject {
     static let scannedKey = "peopleScanDone"
     var hasScanned: Bool { UserDefaults.standard.bool(forKey: Self.scannedKey) }
 
-    func scan(monthsBack: Int = 6) async {
+    /// Default sweep is ~6 months; onboarding passes 60 days so the first-run
+    /// scan is fast (the People tab's Rescan deepens it later).
+    func scan(daysBack: Int = 183) async {
         guard !scanning else { return }
         scanning = true
         defer { scanning = false }
@@ -25,7 +27,7 @@ final class PeopleScanner: ObservableObject {
         }
 
         let cal = Calendar.current
-        let start = cal.date(byAdding: .month, value: -monthsBack, to: Date())!
+        let start = cal.date(byAdding: .day, value: -daysBack, to: Date())!
         let opts = PHFetchOptions()
         opts.predicate = NSPredicate(format: "creationDate >= %@", start as NSDate)
         opts.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]

@@ -46,6 +46,7 @@ struct PikaSyncApp: App {
 struct RootView: View {
     @StateObject private var scanner = PeopleScanner()
     @State private var tab = 0
+    @State private var showOnboarding = false
 
     var body: some View {
         TabView(selection: $tab) {
@@ -66,14 +67,25 @@ struct RootView: View {
         }
         #endif
         .onAppear {
+            showOnboarding = OnboardingState.shouldShow
             #if DEBUG
             if ProcessInfo.processInfo.environment["PIKA_MOCK"] == "1" { return }
             #endif
-            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+            if !showOnboarding { requestNotifications() }
+        }
+        .fullScreenCover(isPresented: $showOnboarding) {
+            OnboardingFlow(scanner: scanner) {
+                showOnboarding = false
+                requestNotifications()
+            }
         }
         #if DEBUG
         .task { await MockSeeder.seedIfRequested() }
         #endif
+    }
+
+    private func requestNotifications() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
 }
 
@@ -178,7 +190,7 @@ struct BooksTab: View {
             Text("Find your people")
                 .font(.system(size: 22, weight: .bold))
                 .foregroundStyle(Pika.ink)
-            Text("Pikabook scans your last 6 months of photos to learn who your books are about. You name and star your family once — every book uses it.")
+            Text("Pikabook scans your last 6 months of photos to learn who your books are about. You name and star your family once, and every book uses it.")
                 .font(.system(size: 15))
                 .foregroundStyle(Pika.inkSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -515,7 +527,7 @@ struct SavedBookView: View {
             shareID = result.shareID
             return true
         }
-        shareStatus = "share failed — check your connection"
+        shareStatus = "share failed. Check your connection"
         try? await Task.sleep(for: .seconds(4))
         shareStatus = nil
         return false
@@ -741,6 +753,11 @@ struct SyncView: View {
 
     var body: some View {
         List {
+            Section {
+                Text("Developer diagnostics for the background experiment. If you're testing Pikabook, you can ignore this tab. Books make themselves.")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Pika.inkSecondary)
+            }
             Section("Setup") {
                 HStack {
                     Text("Photos access")
@@ -783,7 +800,7 @@ struct SyncView: View {
         }
         .scrollContentBackground(.hidden)
         .background(Pika.bg)
-        .navigationTitle("Background sync")
+        .navigationTitle("Diagnostics")
         .onAppear { events = WakeLog.load() }
         .refreshable { events = WakeLog.load() }
     }
@@ -850,11 +867,17 @@ enum MockSeeder {
             for (i, spec) in specs.enumerated() {
                 let file = files[min(i, files.count - 1)]
                 let img = UIImage(contentsOfFile: dir.appendingPathComponent(file).path)
-                let side = min(img?.size.width ?? 200, img?.size.height ?? 200) / 2
                 let crop = img.flatMap { im -> UIImage? in
+                    // Square center crop scaled to 200x200 so mock "face" tiles
+                    // read like real crops.
+                    let side = min(im.size.width, im.size.height)
+                    let scale = 200 / side
                     let r = UIGraphicsImageRenderer(size: CGSize(width: 200, height: 200))
                     return r.image { _ in
-                        im.draw(in: CGRect(x: -side / 4, y: -side / 4, width: 400, height: 400 * (im.size.height / max(im.size.width, 1))))
+                        im.draw(in: CGRect(x: -(im.size.width - side) / 2 * scale,
+                                           y: -(im.size.height - side) / 2 * scale,
+                                           width: im.size.width * scale,
+                                           height: im.size.height * scale))
                     }
                 }
                 PeopleStore.shared.clusters.append(PersonCluster(
