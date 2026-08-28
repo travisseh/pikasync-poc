@@ -7,6 +7,7 @@ struct PikaSyncApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        Analytics.setup()
         SyncEngine.register()
         SyncEngine.autoBookHook = { trigger in await AutoBook.tick(trigger: trigger) }
 
@@ -274,7 +275,8 @@ struct SavedBookView: View {
     @State private var unit = 0
     @State private var shareURL: String?
     @State private var shareID: String?
-    @State private var shareStatus: String?
+    @State private var sharing = false
+    @State private var shareFailed = false
     @State private var showShareSheet = false
     @State private var showFeedback = false
     @State private var showActions = false
@@ -312,14 +314,19 @@ struct SavedBookView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button { Task { await share() } } label: {
-                    Image(systemName: "square.and.arrow.up")
+                if sharing {
+                    ProgressView()
+                } else {
+                    Button { Task { await share() } } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { Task { await openFeedback() } } label: {
                     Image(systemName: "bubble.left")
                 }
+                .disabled(sharing)
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { showActions = true } label: {
@@ -327,18 +334,18 @@ struct SavedBookView: View {
                 }
             }
         }
-        .safeAreaInset(edge: .bottom) {
-            if let status = shareStatus {
-                Text(status)
-                    .font(.system(size: 13))
-                    .foregroundStyle(Pika.inkSecondary)
-                    .padding(8)
-                    .frame(maxWidth: .infinity)
-                    .background(.thinMaterial)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+        .overlay(alignment: .top) {
+            if shareFailed {
+                Text("Couldn't share. Check your connection")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14).padding(.vertical, 8)
+                    .background(Capsule().fill(.red.opacity(0.9)))
+                    .padding(.top, 6)
+                    .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
-        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: shareStatus)
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: shareFailed)
         .sheet(isPresented: $showActions) { actionsSheet }
         .sheet(isPresented: $confirmDelete) { deleteSheet }
         .sheet(isPresented: $showPipelineDetails) { pipelineDetailsSheet }
@@ -361,6 +368,7 @@ struct SavedBookView: View {
                 ensureShareID: { await ensureShared() ? shareID : nil })
         }
         .task {
+            Analytics.capture("book_viewed", ["pages": run.selections.count, "shared": run.shareURL != nil])
             shareURL = run.shareURL
             shareID = run.shareID
             let ids = pages.map(\.assetID) + [run.coverAssetID]
@@ -487,6 +495,7 @@ struct SavedBookView: View {
 
             Button("Delete book") {
                 confirmDelete = false
+                Analytics.capture("book_deleted", ["pages": run.selections.count])
                 RunStore.shared.delete(run.id)
                 dismiss()
             }
@@ -519,18 +528,20 @@ struct SavedBookView: View {
         showFeedback = true
     }
 
-    /// Uploads once (via the shared idempotent path), caches the link.
+    /// Uploads once (via the shared idempotent path), caches the link. Silent
+    /// except for a spinner on the tapped button; brief error capsule on failure.
     private func ensureShared() async -> Bool {
         if shareURL != nil, shareID != nil { return true }
-        if let result = await ShareClient.ensureShared(runID: run.id, progress: { shareStatus = $0 }) {
-            shareStatus = nil
+        sharing = true
+        defer { sharing = false }
+        if let result = await ShareClient.ensureShared(runID: run.id) {
             shareURL = result.url
             shareID = result.shareID
             return true
         }
-        shareStatus = "share failed. Check your connection"
-        try? await Task.sleep(for: .seconds(4))
-        shareStatus = nil
+        shareFailed = true
+        try? await Task.sleep(for: .seconds(3))
+        shareFailed = false
         return false
     }
 }
@@ -724,6 +735,7 @@ struct FeedbackSheet: View {
                         try await ShareClient.sendFeedback(
                             shareID: shareID, page: page,
                             reaction: reaction, text: text)
+                        Analytics.capture("feedback_posted", ["page": page ?? -1, "has_text": !text.isEmpty, "reaction": reaction ?? ""])
                         dismiss()
                     } catch { status = "failed: \(error)" }
                 }

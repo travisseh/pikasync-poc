@@ -81,6 +81,7 @@ enum JudgeClient {
               let jobId = obj["jobId"] as? String else {
             throw PipelineError.message("judge submit: no jobId in response")
         }
+        Analytics.capture("judge_submitted", ["job_id": jobId, "sheets": sheets.count, "count": count])
         return jobId
     }
 
@@ -133,6 +134,7 @@ enum JudgeClient {
         let outTok = parsed.usage?.output_tokens ?? 0
         let cost = Double(inTok) * 3.0 / 1e6 + Double(outTok) * 15.0 / 1e6
         let usageSummary = String(format: "%d in / %d out tokens ≈ $%.3f (sonnet, server)", inTok, outTok, cost)
+        Analytics.capture("judge_collected", ["input_tokens": inTok, "output_tokens": outTok, "cost_usd": cost])
         return JudgeOutput(book: parsed.book, usageSummary: usageSummary)
     }
 

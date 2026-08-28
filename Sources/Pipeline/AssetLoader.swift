@@ -27,6 +27,7 @@ enum AssetLoader {
         opts.isSynchronous = true
         opts.deliveryMode = .highQualityFormat
         opts.isNetworkAccessAllowed = true
+        opts.resizeMode = .fast  // serve a sized derivative; avoids full-res iCloud originals
         return await withCheckedContinuation { cont in
             DispatchQueue.global(qos: .userInitiated).async {
                 var out: [String: UIImage] = [:]

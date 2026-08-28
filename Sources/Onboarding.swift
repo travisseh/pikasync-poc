@@ -92,7 +92,10 @@ struct OnboardingFlow: View {
                     .padding(.horizontal, 32)
             }
             Spacer()
-            Button("Get started") { step = .tagIntro }
+            Button("Get started") {
+                Analytics.capture("onboarding_welcome_continue")
+                step = .tagIntro
+            }
                 .buttonStyle(PillButtonStyle())
                 .padding(.horizontal, 24)
                 .padding(.bottom, 28)
@@ -221,9 +224,11 @@ struct OnboardingFlow: View {
                         let status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
                         switch status {
                         case .authorized:
+                            Analytics.capture("onboarding_permission", ["result": "full"])
                             limitedAccess = false
                             step = .scanning
                         case .limited:
+                            Analytics.capture("onboarding_permission", ["result": "limited"])
                             limitedAccess = true
                             step = .scanning
                         default:
@@ -321,6 +326,7 @@ struct OnboardingFlow: View {
         .task {
             guard !scanner.scanning else { return }
             await scanner.scan(limit: 200)
+            Analytics.capture("onboarding_scan_done", ["clusters": PeopleStore.shared.clusters.count])
             preselectTopPeople()
             step = .people
         }
@@ -359,10 +365,17 @@ struct OnboardingFlow: View {
             VStack(spacing: 10) {
                 Button("Continue") {
                     PeopleStore.shared.save()
+                    Analytics.capture("onboarding_people_saved", [
+                        "clusters": PeopleStore.shared.clusters.count,
+                        "selected": PeopleStore.shared.clusters.filter { $0.role == .required }.count,
+                    ])
                     step = .firstBook
                 }
                 .buttonStyle(PillButtonStyle())
-                Button("Skip for now") { step = .firstBook }
+                Button("Skip for now") {
+                    Analytics.capture("onboarding_people_saved", ["clusters": PeopleStore.shared.clusters.count, "selected": 0, "skipped": true])
+                    step = .firstBook
+                }
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(Pika.inkSecondary)
             }
@@ -412,9 +425,15 @@ struct OnboardingFlow: View {
             Spacer()
             VStack(spacing: 10) {
                 if count >= 8 {
-                    Button("Make my first book") { finish(startBook: true) }
+                    Button("Make my first book") {
+                        Analytics.capture("onboarding_first_book", ["choice": "make"])
+                        finish(startBook: true)
+                    }
                         .buttonStyle(PillButtonStyle())
-                    Button("Maybe later") { finish(startBook: false) }
+                    Button("Maybe later") {
+                        Analytics.capture("onboarding_first_book", ["choice": "later"])
+                        finish(startBook: false)
+                    }
                         .font(.system(size: 15, weight: .medium))
                         .foregroundStyle(Pika.inkSecondary)
                 } else {

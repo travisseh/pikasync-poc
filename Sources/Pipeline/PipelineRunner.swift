@@ -63,6 +63,11 @@ final class PipelineRunner: ObservableObject {
             RunStatusLog.write(month: monthKey, status: status, error: errorText,
                                stages: stageTimes.map { "\($0.name): \($0.detail) (\(String(format: "%.1f", $0.seconds))s)" },
                                trigger: trigger)
+            if let err = errorText {
+                Analytics.capture("run_failed", ["month": monthKey, "trigger": trigger, "error": String(err.prefix(200))])
+            } else {
+                Analytics.capture("book_created", ["month": monthKey, "trigger": trigger, "pages": book?.selections.count ?? 0])
+            }
         }
 
         do {
@@ -99,6 +104,11 @@ final class PipelineRunner: ObservableObject {
             running = false
             RunStatusLog.write(month: state.monthKey, status: status, error: errorText,
                                stages: ["resumed job \(state.jobId.prefix(8))"], trigger: trigger)
+            if let err = errorText {
+                Analytics.capture("run_failed", ["month": state.monthKey, "trigger": "resume", "error": String(err.prefix(200))])
+            } else {
+                Analytics.capture("book_created", ["month": state.monthKey, "trigger": "resume", "pages": book?.selections.count ?? 0])
+            }
         }
         guard let month = state.month else {
             InteractiveBuildState.clear()
@@ -318,7 +328,7 @@ final class PipelineRunner: ObservableObject {
             // moment it exists. Best-effort — a failure here never fails
             // the run; the app-open sweep retries any unshared book.
             status = "sharing your book…"
-            _ = await ShareClient.ensureShared(runID: saved.id) { [weak self] in self?.status = $0 }
+            _ = await ShareClient.ensureShared(runID: saved.id)  // silent: no UI while auto-share runs
             status = "done — \(result.book.selections.count)-photo book ready"
         }
         return saved
@@ -513,6 +523,12 @@ final class PipelineRunner: ObservableObject {
     private func record(_ name: String, since t0: Date, _ detail: String) {
         stageTimes.append(StageTime(name: name, seconds: Date().timeIntervalSince(t0), detail: detail))
         status = name + " done"
+        Analytics.capture("book_stage", [
+            "stage": name,
+            "seconds": Date().timeIntervalSince(t0),
+            "detail": detail,
+            "trigger": trigger,
+        ])
     }
 }
 

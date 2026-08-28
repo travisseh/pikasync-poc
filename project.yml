@@ -4,11 +4,17 @@ options:
   bundleIdPrefix: com.travisse
   deploymentTarget:
     iOS: "18.0"
+packages:
+  PostHog:
+    url: https://github.com/PostHog/posthog-ios
+    from: 3.19.0
 targets:
   PikaSync:
     type: application
     platform: iOS
     sources: [Sources]
+    dependencies:
+      - package: PostHog
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.travisse.pikasync
@@ -46,6 +52,8 @@ targets:
     sources:
       - path: Sources
         excludes: ["Info.plist"]
+    dependencies:
+      - package: PostHog
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.travisse.pikabook
@@ -56,7 +64,7 @@ targets:
         INFOPLIST_KEY_UIBackgroundModes: "fetch processing remote-notification"
         GENERATE_INFOPLIST_FILE: YES
         CURRENT_PROJECT_VERSION: 1
-        MARKETING_VERSION: 0.3.1
+        MARKETING_VERSION: 0.3.2
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     info:

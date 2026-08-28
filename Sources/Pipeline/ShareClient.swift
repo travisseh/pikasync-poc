@@ -43,9 +43,30 @@ enum ShareClient {
     }
 
     static func upload(run: SavedRun, progress: @MainActor @escaping (String) -> Void) async throws -> ShareResult {
+        let t0 = Date()
+        Analytics.capture("share_upload_started", ["pages": run.selections.count + 1])
+        do {
+            let result = try await uploadInner(run: run)
+            Analytics.capture("share_upload_completed", [
+                "pages": run.selections.count + 1,
+                "seconds": Date().timeIntervalSince(t0),
+                "bytes": result.bytes,
+            ])
+            return result.share
+        } catch {
+            Analytics.capture("share_upload_failed", [
+                "seconds": Date().timeIntervalSince(t0),
+                "error": String(describing: error).prefix(200).description,
+            ])
+            throw error
+        }
+    }
+
+    private static func uploadInner(run: SavedRun) async throws -> (share: ShareResult, bytes: Int) {
         // Page 0 is the cover; book pages follow in order.
         let ordered = [run.coverAssetID] + run.selections.sorted { $0.page < $1.page }.map(\.assetID)
-        await progress("loading photos…")
+        // 1600px derivatives (not full-res originals) — much cheaper when the
+        // library is iCloud-optimized.
         let images = await AssetLoader.load(ids: Array(Set(ordered)), size: CGSize(width: 1600, height: 1600))
 
         struct CreateResp: Codable {
@@ -53,7 +74,6 @@ enum ShareClient {
             let shareId: String
             let uploadUrls: [String]
         }
-        await progress("creating book…")
         let create: CreateResp = try await postJSON(path: "/create-book", body: [
             "title": run.title,
             "monthLabel": run.monthLabel,
@@ -62,32 +82,51 @@ enum ShareClient {
         ])
 
         struct UploadResp: Codable { let storageId: String }
-        var pages: [[String: Any]] = []
-        for (i, assetID) in ordered.enumerated() {
+        // Encode + upload pages concurrently (5 in flight) instead of one by one.
+        let jpegs: [(page: Int, url: String, data: Data)] = try ordered.enumerated().map { i, assetID in
             guard let img = images[assetID],
                   let jpeg = normalized(img).jpegData(compressionQuality: 0.8) else {
                 throw PipelineError.message("couldn't load photo for page \(i)")
             }
-            await progress("uploading \(i + 1)/\(ordered.count)…")
-            var req = URLRequest(url: URL(string: create.uploadUrls[i])!)
-            req.httpMethod = "POST"
-            req.setValue("image/jpeg", forHTTPHeaderField: "content-type")
-            req.httpBody = jpeg
-            let (data, resp) = try await URLSession.shared.data(for: req)
-            guard (resp as? HTTPURLResponse)?.statusCode == 200 else {
-                throw PipelineError.message("page upload failed (\((resp as? HTTPURLResponse)?.statusCode ?? -1))")
+            return (i, create.uploadUrls[i], jpeg)
+        }
+        let totalBytes = jpegs.reduce(0) { $0 + $1.data.count }
+        let pages: [[String: Any]] = try await withThrowingTaskGroup(of: (Int, String).self) { group in
+            var results: [Int: String] = [:]
+            var iterator = jpegs.makeIterator()
+            var inFlight = 0
+            func addNext() {
+                guard let job = iterator.next() else { return }
+                inFlight += 1
+                group.addTask {
+                    var req = URLRequest(url: URL(string: job.url)!)
+                    req.httpMethod = "POST"
+                    req.setValue("image/jpeg", forHTTPHeaderField: "content-type")
+                    req.httpBody = job.data
+                    let (data, resp) = try await URLSession.shared.data(for: req)
+                    guard (resp as? HTTPURLResponse)?.statusCode == 200 else {
+                        throw PipelineError.message("page upload failed (\((resp as? HTTPURLResponse)?.statusCode ?? -1))")
+                    }
+                    let up = try JSONDecoder().decode(UploadResp.self, from: data)
+                    return (job.page, up.storageId)
+                }
             }
-            let up = try JSONDecoder().decode(UploadResp.self, from: data)
-            pages.append(["page": i, "storageId": up.storageId])
+            for _ in 0..<5 { addNext() }
+            while inFlight > 0 {
+                guard let (page, storageId) = try await group.next() else { break }
+                inFlight -= 1
+                results[page] = storageId
+                addNext()
+            }
+            return results.sorted { $0.key < $1.key }.map { ["page": $0.key, "storageId": $0.value] }
         }
 
-        await progress("finalizing…")
         struct OkResp: Codable { let ok: Bool }
         let _: OkResp = try await postJSON(path: "/finalize-book", body: [
             "bookId": create.bookId,
             "pages": pages,
         ])
-        return ShareResult(url: shareBase + create.shareId, shareID: create.shareId)
+        return (ShareResult(url: shareBase + create.shareId, shareID: create.shareId), totalBytes)
     }
 
     /// In-app feedback lands in the same Convex table the web viewers write to.

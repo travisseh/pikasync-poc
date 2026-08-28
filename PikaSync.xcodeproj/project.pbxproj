@@ -41,18 +41,22 @@
 		9992391449C7BC5CAD2A1D46 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE6A140D122087AD716AEA7 /* Theme.swift */; };
 		9ACBDC116780B2FE10CC7E88 /* RunStatusLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249C93078D8EE26D11ED359F /* RunStatusLog.swift */; };
 		9C99EAA2075909A85A7E4F39 /* RunStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3067CD55884C0BBEE7EF181D /* RunStore.swift */; };
+		A2B31B5982EFBBE42A7B8D27 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50F53B7C2B209A0DA367A4E /* Analytics.swift */; };
 		A470DD0E31F36FF60B600B95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86608F9EE1B1871912091AB3 /* Assets.xcassets */; };
 		A6A9B1223B827877780F5AC4 /* PeopleScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFE323F5B3C8AB3FE1A89DD /* PeopleScanner.swift */; };
 		A75359DA463DFA82116988D4 /* PeoplePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3ED4365EA50385C88AED85 /* PeoplePickerView.swift */; };
 		A7DB15953428C6938B99E4A0 /* Secrets.example.swift.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0642578F74527EE393AC9C5F /* Secrets.example.swift.txt */; };
 		AC1A233DACC0C3EFC213975F /* IncrementalScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BA830477CF75E6FDC4F375 /* IncrementalScorer.swift */; };
 		B107EA5F495D3B7037B0A859 /* WakeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAEDF624447F6C43243796F /* WakeLog.swift */; };
+		B86C6996012E45D295CE5497 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 9F7DF467433A620A800610CD /* PostHog */; };
 		BB17ABC85415E935FF287ADD /* RunStatusLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249C93078D8EE26D11ED359F /* RunStatusLog.swift */; };
 		CA6965E31A4A3D5B432F442E /* PipelineRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */; };
 		CA80745157BFB7428BD797D5 /* ContactSheetRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372A4E77A18DA6C92E1C803 /* ContactSheetRenderer.swift */; };
 		CBED4365709F1372332B7359 /* JudgeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */; };
 		D15C8F72DCEEF518BE85A0E7 /* SyncIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86CF5CB7FA43E809A0C4CD7 /* SyncIntent.swift */; };
+		D26F5D44588AE4BA3AE74749 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = B3AAF17A2C5725D19C22EE7D /* PostHog */; };
 		D7274D2524D4EEF6EC912EB0 /* PipelineRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87FFA1983F3CE2AAE8EEEC1 /* PipelineRunner.swift */; };
+		D7CA2233DC3F04394AC281D1 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50F53B7C2B209A0DA367A4E /* Analytics.swift */; };
 		DA1549D435EE915AD5FF55CB /* FaceEmbedder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B093237EA24679EBDAB4454F /* FaceEmbedder.swift */; };
 		DA4D0A45FB6AA362E38ABB33 /* SyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C79CFB46F1024878927C55 /* SyncEngine.swift */; };
 		DE994D60F440CA56D08ADCFD /* VisionScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3381FEE037C5170449DEAD88 /* VisionScorer.swift */; };
@@ -94,6 +98,7 @@
 		ADF9BB1706941D3074E5B2EC /* RemoteCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCommand.swift; sourceTree = "<group>"; };
 		AF771AC045A10D44432855EB /* PikaSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PikaSyncApp.swift; sourceTree = "<group>"; };
 		B093237EA24679EBDAB4454F /* FaceEmbedder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceEmbedder.swift; sourceTree = "<group>"; };
+		B50F53B7C2B209A0DA367A4E /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		B61B3D54A90144B7B9F42955 /* FaceEmbedding.mlpackage */ = {isa = PBXFileReference; path = FaceEmbedding.mlpackage; sourceTree = "<group>"; };
 		C4D3EA9AFA6AD90013E1DD09 /* PikaSync.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PikaSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C612A5C4C7DD7B36517BBD27 /* AutoBookState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoBookState.swift; sourceTree = "<group>"; };
@@ -109,10 +114,30 @@
 		FF98C061FC23908AB6CE5C37 /* JudgeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JudgeClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		37F24D7A01FD374C3B560E16 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D26F5D44588AE4BA3AE74749 /* PostHog in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C93538EFF61EEE0078812CAA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B86C6996012E45D295CE5497 /* PostHog in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
 		1511E44BBC47A67A1AEB148D /* Pipeline */ = {
 			isa = PBXGroup;
 			children = (
+				B50F53B7C2B209A0DA367A4E /* Analytics.swift */,
 				74AAFE69AD28336C82801908 /* AssetLoader.swift */,
 				FB66E6C656A87E221C65E6D1 /* AutoBook.swift */,
 				C612A5C4C7DD7B36517BBD27 /* AutoBookState.swift */,
@@ -217,6 +242,7 @@
 			buildPhases = (
 				F47876EE9F2488ADDBA5EF44 /* Sources */,
 				0663BA35C5C32A0502B484AA /* Resources */,
+				C93538EFF61EEE0078812CAA /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -224,6 +250,7 @@
 			);
 			name = PikabookTF;
 			packageProductDependencies = (
+				9F7DF467433A620A800610CD /* PostHog */,
 			);
 			productName = PikabookTF;
 			productReference = D8CC4E8106D94359D19F6A32 /* PikabookTF.app */;
@@ -235,6 +262,7 @@
 			buildPhases = (
 				B90130747C21966512F0FF85 /* Sources */,
 				FB6C851ACA55BCE146BD6253 /* Resources */,
+				37F24D7A01FD374C3B560E16 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -242,6 +270,7 @@
 			);
 			name = PikaSync;
 			packageProductDependencies = (
+				B3AAF17A2C5725D19C22EE7D /* PostHog */,
 			);
 			productName = PikaSync;
 			productReference = C4D3EA9AFA6AD90013E1DD09 /* PikaSync.app */;
@@ -279,6 +308,9 @@
 			);
 			mainGroup = AC5E5005C19A4FEC1DB8D4FB;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				736C0FD9A83379D3EA3CD74D /* XCRemoteSwiftPackageReference "posthog-ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3D161EA72F20D00AC0B31653 /* Products */;
 			projectDirPath = "";
@@ -317,6 +349,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2B31B5982EFBBE42A7B8D27 /* Analytics.swift in Sources */,
 				F968DBE3C22AE4C792D02DC0 /* AssetLoader.swift in Sources */,
 				E0AF3797B6E6AC8173ACABD6 /* AutoBook.swift in Sources */,
 				0F51B462C25D69302D1B997F /* AutoBookState.swift in Sources */,
@@ -362,6 +395,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D7CA2233DC3F04394AC281D1 /* Analytics.swift in Sources */,
 				834EC773A93D8B651C607A53 /* AssetLoader.swift in Sources */,
 				F638CA6EFC2585E79C32044E /* AutoBook.swift in Sources */,
 				052AC12543E0B897B4CBE775 /* AutoBookState.swift in Sources */,
@@ -412,7 +446,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.travisse.pikabook;
 				PRODUCT_NAME = Pikabook;
 				SDKROOT = iphoneos;
@@ -524,7 +558,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.travisse.pikabook;
 				PRODUCT_NAME = Pikabook;
 				SDKROOT = iphoneos;
@@ -700,6 +734,30 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		736C0FD9A83379D3EA3CD74D /* XCRemoteSwiftPackageReference "posthog-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/PostHog/posthog-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.19.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9F7DF467433A620A800610CD /* PostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 736C0FD9A83379D3EA3CD74D /* XCRemoteSwiftPackageReference "posthog-ios" */;
+			productName = PostHog;
+		};
+		B3AAF17A2C5725D19C22EE7D /* PostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 736C0FD9A83379D3EA3CD74D /* XCRemoteSwiftPackageReference "posthog-ios" */;
+			productName = PostHog;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D81D7EBE128649F61D65B14B /* Project object */;
 }
