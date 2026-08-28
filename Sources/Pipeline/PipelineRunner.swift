@@ -67,36 +67,121 @@ final class PipelineRunner: ObservableObject {
 
         do {
             let prepared = try await prepare(month: month)
-            let monthName = prepared.monthName
-            let chosen = prepared.chosen
-            let bookCount = prepared.bookCount
 
-            // Stage 6: LLM judge (synchronous endpoint for interactive runs)
-            var t0 = Date()
-            status = "judging (claude-sonnet-5)"
-            var result = try await JudgeClient.judge(sheets: sheets, monthLabel: monthName, count: bookCount, maxIndex: chosen.count - 1)
-
-            // Deterministic same-scene check on the judge's picks: prompt rules
-            // bend under pool pressure, feature-print math doesn't. One residual
-            // pair is tolerated (a major event legitimately carries two pages);
-            // retry only at >=2.
-            let violations = sceneViolations(result.book, chosen: chosen)
-            if violations.count >= 2 {
-                let detail = correctionText(violations)
-                status = "judge re-pick (\(violations.count) same-scene pairs)"
-                result = try await JudgeClient.judge(sheets: sheets, monthLabel: monthName, count: bookCount, maxIndex: chosen.count - 1, correction: detail)
-                let remaining = sceneViolations(result.book, chosen: chosen)
-                record("scene re-pick", since: t0, remaining.count <= 1 ? "clean after retry (\(remaining.count) residual)" : "\(remaining.count) pairs still similar (accepted)")
-            } else if violations.count == 1 {
-                record("scene check", since: t0, "1 residual pair (tolerated — likely major event)")
-            }
-            record("LLM judge", since: t0, result.usageSummary)
-            t0 = Date()
-            _ = await saveBook(result: result, chosen: chosen, monthName: monthName, share: true)
+            // Stage 6: async judge, persisted. The sync endpoint dies if iOS
+            // suspends us mid-call (screen lock was enough to hang a build);
+            // submit + poll survives suspension, and the persisted state lets
+            // a killed app resume on next launch.
+            let t0 = Date()
+            status = "Claude is choosing your photos…"
+            let jobId = try await JudgeClient.submit(sheets: prepared.sheets, monthLabel: prepared.monthName,
+                                                     count: prepared.bookCount, maxIndex: prepared.chosen.count - 1)
+            var state = InteractiveBuildState(monthKey: monthKey, jobId: jobId,
+                                              shortlistIDs: prepared.chosen.map(\.id),
+                                              bookCount: prepared.bookCount, monthName: prepared.monthName,
+                                              submittedAt: Date(), correctionRound: 0)
+            state.save()
+            try await pollAndFinish(state: state, chosen: prepared.chosen, since: t0)
         } catch {
             errorText = "\(error)"
             status = "failed"
         }
+    }
+
+    /// Resume a persisted interactive judge job (app was suspended or killed
+    /// mid-judge). Rebuilds the shortlist from the score store and polls to
+    /// completion.
+    func resume(state: InteractiveBuildState) async {
+        running = true
+        errorText = nil
+        stageTimes = []
+        defer {
+            running = false
+            RunStatusLog.write(month: state.monthKey, status: status, error: errorText,
+                               stages: ["resumed job \(state.jobId.prefix(8))"], trigger: trigger)
+        }
+        guard let month = state.month else {
+            InteractiveBuildState.clear()
+            errorText = "bad interactive-build state"
+            status = "failed"
+            return
+        }
+        let chosen = Self.chosen(fromIDs: state.shortlistIDs, month: month)
+        status = "Claude is choosing your photos…"
+        do {
+            try await pollAndFinish(state: state, chosen: chosen, since: Date())
+        } catch {
+            errorText = "\(error)"
+            status = "failed"
+        }
+    }
+
+    /// Poll the async judge every ~5s until done, handling one corrective
+    /// re-pick and stale-job resubmission. Clears the persisted state on any
+    /// terminal outcome.
+    private func pollAndFinish(state initial: InteractiveBuildState, chosen: [PhotoScore], since t0: Date) async throws {
+        var state = initial
+        while true {
+            let jobStatus: JudgeClient.JobStatus
+            do {
+                jobStatus = try await JudgeClient.result(jobId: state.jobId, maxIndex: chosen.count - 1)
+            } catch {
+                // Transient network problem: keep the job, keep polling.
+                status = "Claude is choosing your photos… (reconnecting)"
+                try await Task.sleep(for: .seconds(5))
+                continue
+            }
+            switch jobStatus {
+            case .pending:
+                if Date().timeIntervalSince(state.submittedAt) > AutoBookState.staleAfter {
+                    // Server lost the job: resubmit fresh.
+                    let sheets = await renderSheets(chosen: chosen)
+                    let jobId = try await JudgeClient.submit(sheets: sheets, monthLabel: state.monthName,
+                                                             count: state.bookCount, maxIndex: chosen.count - 1)
+                    state.jobId = jobId
+                    state.correctionRound = 0
+                    state.submittedAt = Date()
+                    state.save()
+                }
+                status = "Claude is choosing your photos…"
+                try await Task.sleep(for: .seconds(5))
+            case .failed(let err):
+                InteractiveBuildState.clear()
+                throw PipelineError.message("judge failed: \(err)")
+            case .done(let result):
+                let violations = sceneViolations(result.book, chosen: chosen)
+                if violations.count >= 2 && state.correctionRound == 0 {
+                    status = "judge re-pick (\(violations.count) same-scene pairs)"
+                    let sheets = await renderSheets(chosen: chosen)
+                    let jobId = try await JudgeClient.submit(sheets: sheets, monthLabel: state.monthName,
+                                                             count: state.bookCount, maxIndex: chosen.count - 1,
+                                                             correction: correctionText(violations))
+                    state.jobId = jobId
+                    state.correctionRound = 1
+                    state.submittedAt = Date()
+                    state.save()
+                    continue
+                }
+                if violations.count == 1 {
+                    record("scene check", since: t0, "1 residual pair (tolerated: likely major event)")
+                } else if state.correctionRound == 1 {
+                    record("scene re-pick", since: t0, violations.count <= 1 ? "clean after retry" : "\(violations.count) pairs still similar (accepted)")
+                }
+                record("LLM judge", since: t0, result.usageSummary)
+                InteractiveBuildState.clear()
+                _ = await saveBook(result: result, chosen: chosen, monthName: state.monthName, share: true)
+                return
+            }
+        }
+    }
+
+    /// Contact sheets for the current shortlist, rendering only if the cached
+    /// set from prepare() isn't available (e.g. a resumed run).
+    private func renderSheets(chosen: [PhotoScore]) async -> [UIImage] {
+        if !sheets.isEmpty { return sheets }
+        let images = await loadThumbs(ids: chosen.map(\.id), size: CGSize(width: 420, height: 420))
+        sheets = ContactSheetRenderer.render(scores: chosen, thumbs: images)
+        return sheets
     }
 
     /// Stages 1-5 + sizing. Throws on permission / thin-month problems.

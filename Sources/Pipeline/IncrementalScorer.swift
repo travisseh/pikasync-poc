@@ -32,6 +32,16 @@ enum IncrementalScorer {
         return scores
     }
 
+    /// Merge externally produced scores (e.g. the onboarding scan) into the
+    /// month's store, skipping ids already present.
+    static func merge(_ new: [PhotoScore], month: Date) {
+        guard !new.isEmpty else { return }
+        var scores = loadScores(month: month)
+        let done = Set(scores.map(\.id))
+        scores.append(contentsOf: new.filter { !done.contains($0.id) })
+        save(scores, month: month)
+    }
+
     private static func save(_ scores: [PhotoScore], month: Date) {
         if let data = try? JSONEncoder().encode(scores) {
             try? data.write(to: storeURL(month: month))

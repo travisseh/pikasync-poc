@@ -37,6 +37,7 @@ struct PikaSyncApp: App {
                 SyncEngine.schedule()
             } else if phase == .active {
                 RemoteCommand.checkAndRun()
+                CreateCoordinator.shared.resumeIfNeeded()
                 Task { await ShareClient.sweepUnshared() }
             }
         }

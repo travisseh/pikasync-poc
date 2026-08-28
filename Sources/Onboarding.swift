@@ -2,9 +2,9 @@ import SwiftUI
 import Photos
 
 /// First-run onboarding: welcome → "your people" intro → permission priming →
-/// fast 60-day people scan → pick who books center on (top 3 pre-selected) →
-/// auto-create last month's book. Shown only when the app has no people and
-/// no books; existing users never see it.
+/// fast scan of the most recent 200 photos → pick who books center on (top 3
+/// pre-selected) → a dedicated "make my first book" step. Shown only when the
+/// app has no people and no books; existing users never see it.
 enum OnboardingState {
     static let doneKey = "onboardingDone"
     static var done: Bool {
@@ -28,7 +28,7 @@ struct OnboardingFlow: View {
     @ObservedObject var scanner: PeopleScanner
     let finished: () -> Void
 
-    enum Step { case welcome, tagIntro, permission, denied, scanning, people }
+    enum Step { case welcome, tagIntro, permission, denied, scanning, people, firstBook }
     @State private var step: Step = .welcome
     @State private var limitedAccess = false
     @Environment(\.scenePhase) private var scenePhase
@@ -43,6 +43,7 @@ struct OnboardingFlow: View {
             case .denied: denied
             case .scanning: scanning
             case .people: people
+            case .firstBook: firstBook
             }
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: step)
@@ -64,6 +65,7 @@ struct OnboardingFlow: View {
             case "onboarding-denied": step = .denied
             case "onboarding-scanning": step = .scanning
             case "onboarding-people": step = .people
+            case "onboarding-firstbook": step = .firstBook
             default: break
             }
         }
@@ -275,7 +277,7 @@ struct OnboardingFlow: View {
         .transition(.opacity)
     }
 
-    // MARK: scanning (fast: last 60 days)
+    // MARK: scanning (fast: most recent 200 photos)
 
     private var scanning: some View {
         VStack(spacing: 0) {
@@ -300,7 +302,7 @@ struct OnboardingFlow: View {
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(Pika.ink)
                     .multilineTextAlignment(.center)
-                Text(scanner.statusText.isEmpty ? "Looking through your recent photos…" : scanner.statusText)
+                Text(scanner.statusText.isEmpty ? "Looking through your last 200 photos…" : scanner.statusText)
                     .font(.system(size: 15))
                     .foregroundStyle(Pika.inkSecondary)
                     .contentTransition(.numericText())
@@ -318,7 +320,7 @@ struct OnboardingFlow: View {
         .transition(.opacity)
         .task {
             guard !scanner.scanning else { return }
-            await scanner.scan(daysBack: 60)
+            await scanner.scan(limit: 200)
             preselectTopPeople()
             step = .people
         }
@@ -355,14 +357,73 @@ struct OnboardingFlow: View {
             OnboardingPeopleGrid()
                 .padding(.top, 20)
             VStack(spacing: 10) {
-                Button("Make my first book") { finish(startBook: true) }
-                    .buttonStyle(PillButtonStyle())
-                Button("Skip for now") { finish(startBook: true) }
+                Button("Continue") {
+                    PeopleStore.shared.save()
+                    step = .firstBook
+                }
+                .buttonStyle(PillButtonStyle())
+                Button("Skip for now") { step = .firstBook }
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(Pika.inkSecondary)
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 16)
+        }
+        .transition(.opacity)
+    }
+
+    // MARK: first book
+
+    private var lastMonth: Date? {
+        let cal = Calendar.current
+        let thisMonth = cal.date(from: cal.dateComponents([.year, .month], from: Date()))!
+        return cal.date(byAdding: .month, value: -1, to: thisMonth)
+    }
+
+    private var firstBook: some View {
+        let month = lastMonth
+        let count = month.map(monthPhotoCount) ?? 0
+        let label = month.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) } ?? ""
+        let monthName = String(label.split(separator: " ").first ?? "last month")
+        return VStack(spacing: 0) {
+            Spacer()
+            page(color: Pika.accent, icon: "book.pages.fill", rotation: -4, offset: .zero, prominent: true)
+                .frame(height: 210)
+            Spacer().frame(height: 32)
+            VStack(spacing: 12) {
+                Text("Your first book")
+                    .font(.system(size: 34, weight: .bold))
+                    .foregroundStyle(Pika.ink)
+                    .multilineTextAlignment(.center)
+                if count >= 8 {
+                    Text("You're set. Pikabook can make your \(monthName) book right now: it takes about a minute, and every month from here on happens by itself.")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Pika.inkSecondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                } else {
+                    Text("Last month only has \(count) photos, which is too few for a good book. No problem: Pikabook will make your first one automatically when this month wraps up.")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Pika.inkSecondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                }
+            }
+            Spacer()
+            VStack(spacing: 10) {
+                if count >= 8 {
+                    Button("Make my first book") { finish(startBook: true) }
+                        .buttonStyle(PillButtonStyle())
+                    Button("Maybe later") { finish(startBook: false) }
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(Pika.inkSecondary)
+                } else {
+                    Button("Finish") { finish(startBook: false) }
+                        .buttonStyle(PillButtonStyle())
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 28)
         }
         .transition(.opacity)
     }

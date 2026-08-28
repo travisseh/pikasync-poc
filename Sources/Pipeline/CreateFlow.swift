@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// In-list book creation: the FAB opens a "Create Photobook" sheet; Create
 /// inserts a loading entry at the top of the Books list and runs the pipeline
@@ -46,6 +47,7 @@ final class CreateCoordinator: ObservableObject {
     }
 
     private func run(_ build: Build) {
+        UIApplication.shared.isIdleTimerDisabled = true  // keep the screen awake while building
         Task { @MainActor in
             await build.runner.run(month: build.month)
             if build.runner.errorText == nil {
@@ -53,7 +55,34 @@ final class CreateCoordinator: ObservableObject {
                 // the loading entry.
                 self.dismiss(build)
             }
+            self.updateIdleTimer()
         }
+    }
+
+    /// If a persisted interactive judge job exists (app was suspended or
+    /// killed mid-judge), surface it as a resuming build and poll it to
+    /// completion. Called on launch and on every return to foreground.
+    func resumeIfNeeded() {
+        guard let state = InteractiveBuildState.load(),
+              builds.allSatisfy({ !$0.runner.running }),
+              let month = state.month else { return }
+        let build = Build(month: month)
+        build.runner.status = "Claude is choosing your photos…"
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            builds.insert(build, at: 0)
+        }
+        UIApplication.shared.isIdleTimerDisabled = true
+        Task { @MainActor in
+            await build.runner.resume(state: state)
+            if build.runner.errorText == nil {
+                self.dismiss(build)
+            }
+            self.updateIdleTimer()
+        }
+    }
+
+    private func updateIdleTimer() {
+        UIApplication.shared.isIdleTimerDisabled = builds.contains { $0.runner.running }
     }
 }
 

@@ -38,3 +38,46 @@ struct AutoBookState: Codable {
         try? FileManager.default.removeItem(at: url)
     }
 }
+
+/// Persisted in-flight INTERACTIVE judge job (Documents/interactive-build.json).
+/// If the app is suspended or killed mid-judge (screen lock is enough), the
+/// create flow resumes polling on next launch/foreground instead of hanging.
+struct InteractiveBuildState: Codable {
+    var monthKey: String
+    var jobId: String
+    var shortlistIDs: [String]
+    var bookCount: Int
+    var monthName: String
+    var submittedAt: Date
+    var correctionRound: Int
+
+    static let monthFmt: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM"
+        return f
+    }()
+
+    var month: Date? { Self.monthFmt.date(from: monthKey) }
+
+    private static var url: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("interactive-build.json")
+    }
+
+    static func load() -> InteractiveBuildState? {
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        let dec = JSONDecoder()
+        dec.dateDecodingStrategy = .iso8601
+        return try? dec.decode(InteractiveBuildState.self, from: data)
+    }
+
+    func save() {
+        let enc = JSONEncoder()
+        enc.dateEncodingStrategy = .iso8601
+        try? enc.encode(self).write(to: Self.url, options: .atomic)
+    }
+
+    static func clear() {
+        try? FileManager.default.removeItem(at: url)
+    }
+}
